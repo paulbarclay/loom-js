@@ -13,5 +13,5 @@ export function createDefaultTxMiddleware(
   privateKey: Uint8Array
 ): ITxMiddlewareHandler[] {
   const pubKey = publicKeyFromPrivateKey(privateKey)
-  return [new NonceTxMiddleware(pubKey, client), new SignedTxMiddleware(privateKey)]
+  return [new NonceTxMiddleware(client), new SignedTxMiddleware(client)]
 }

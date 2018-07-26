@@ -22,18 +22,18 @@ class InvalidNonceTxMiddleware implements ITxMiddlewareHandler {
   failureCount: number = 0
   currentAttempt: number = 0
 
-  constructor(publicKey: Uint8Array, client: Client) {
-    this._mw = new NonceTxMiddleware(publicKey, client)
+  constructor(client: Client) {
+    this._mw = new NonceTxMiddleware(client)
   }
 
-  async Handle(txData: Readonly<Uint8Array>, publicKey: Uint8Array): Promise<Uint8Array> {
+  async Handle(txData: Readonly<Uint8Array>, localAddress: string): Promise<Uint8Array> {
     if (this.currentAttempt++ < this.failureCount) {
       const tx = new NonceTx()
       tx.setInner(txData as Uint8Array)
       tx.setSequence(0)
       return tx.serializeBinary()
     } else {
-      return this._mw.Handle(txData, publicKey)
+      return this._mw.Handle(txData, localAddress)
     }
   }
 }
@@ -42,10 +42,10 @@ test('Client nonce retry strategy', async t => {
   try {
     const privKey = CryptoUtils.generatePrivateKey()
     const pubKey = CryptoUtils.publicKeyFromPrivateKey(privKey)
-    const client = createTestClient()
+    const client = createTestClient(privKey)
 
-    const nonceMiddlware = new InvalidNonceTxMiddleware(pubKey, client)
-    client.txMiddleware = [nonceMiddlware, new SignedTxMiddleware(privKey)]
+    const nonceMiddlware = new InvalidNonceTxMiddleware(client)
+    client.txMiddleware = [nonceMiddlware, new SignedTxMiddleware(client)]
 
     const contractAddr = await client.getContractAddressAsync('BluePrint')
     if (!contractAddr) {

@@ -25,7 +25,7 @@ import { deployContract } from '../evm-helpers'
 test('LoomProvider', async t => {
   try {
     const privKey = CryptoUtils.generatePrivateKey()
-    const client = createTestClient()
+    const client = createTestClient(privKey)
     const fromAddr = LocalAddress.fromPublicKey(
       CryptoUtils.publicKeyFromPrivateKey(privKey)
     ).toString()

@@ -54,7 +54,11 @@ export class EvmContract extends EventEmitter {
    * @param args ABI encoded function signature and input paramters.
    * @returns A promise that will be resolved with return value (if any) of the contract method.
    */
-  async callAsync(caller: Address, args: number[], output?: Uint8Array): Promise<Uint8Array | void> {
+  async callAsync(
+    caller: Address,
+    args: number[],
+    output?: Uint8Array
+  ): Promise<Uint8Array | void> {
     const ui8InData = Uint8Array.from(args)
     const callTx = new CallTx()
     callTx.setVmType(VMType.EVM)
@@ -69,7 +73,7 @@ export class EvmContract extends EventEmitter {
     tx.setId(2)
     tx.setData(msgTx.serializeBinary())
 
-    return this._client.commitTxAsync<Transaction>(caller.local.bytes, tx)
+    return this._client.commitTxAsync<Transaction>(caller.local.toString(), tx)
   }
   /**
    * Calls a method of a contract running on an EVM that doesn't mutate state.

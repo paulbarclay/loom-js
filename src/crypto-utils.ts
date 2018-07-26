@@ -18,6 +18,10 @@ export function bytesToHexAddr(bytes: Uint8Array): string {
   return '0x' + bytesToHex(bytes)
 }
 
+export function bytesToHexAddrLC(bytes: Uint8Array): string {
+  return bytesToHexAddr(bytes).toLowerCase()
+}
+
 export function getGUID(): string {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)

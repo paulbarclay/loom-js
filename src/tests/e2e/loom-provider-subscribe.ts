@@ -38,7 +38,7 @@ const contractData =
 test('LoomProvider + Subscribe', async t => {
   try {
     const privKey = CryptoUtils.generatePrivateKey()
-    const client = createTestClient()
+    const client = createTestClient(privKey)
     client.on('error', msg => console.error('Error on client:', msg))
     const fromAddr = LocalAddress.fromPublicKey(
       CryptoUtils.publicKeyFromPrivateKey(privKey)

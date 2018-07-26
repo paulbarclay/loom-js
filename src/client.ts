@@ -12,11 +12,12 @@ import {
   EthFilterLogList,
   EthTxHashList
 } from './proto/loom_pb'
-import { Uint8ArrayToB64, B64ToUint8Array, bufferToProtobufBytes } from './crypto-utils'
+import { Uint8ArrayToB64, B64ToUint8Array, bufferToProtobufBytes, publicKeyFromPrivateKey, bytesToHex, bytesToHexAddr, bytesToHexAddrLC } from './crypto-utils'
 import { Address, LocalAddress } from './address'
 import { WSRPCClient, IJSONRPCEvent } from './internal/ws-rpc-client'
 import { RPCClientEvent, IJSONRPCClient } from './internal/json-rpc-client'
 import { CryptoUtils } from '.';
+import { LoomProvider } from './loom-provider';
 
 interface ITxHandlerResult {
   code?: number
@@ -38,7 +39,7 @@ const log = debug('client')
  * Handlers should not modify the original input data in any way.
  */
 export interface ITxMiddlewareHandler {
-  Handle(txData: Readonly<Uint8Array>, publicKey: Uint8Array): Promise<Uint8Array>
+  Handle(txData: Readonly<Uint8Array>, localAddress: string): Promise<Uint8Array>
 }
 
 export enum ClientEvent {
@@ -221,8 +222,10 @@ export class Client extends EventEmitter {
       }
     })
     this.nonceCallback = nonceCallback ? nonceCallback : this.getNonceAsyncCallback;
+    this.accounts = new Map<string, Uint8Array>()
     this.caller = this.getNewCaller()
   }
+
 
   /**
    * Cleans up all underlying network resources.
@@ -249,7 +252,7 @@ export class Client extends EventEmitter {
    * @returns Result (if any) returned by the tx handler in the contract that processed the tx.
    */
   commitTxAsync<T extends Message>(
-    publicKey: Uint8Array,
+    localAddress: string,
     tx: T,
     opts: { middleware?: ITxMiddlewareHandler[] } = {}
   ): Promise<Uint8Array | void> {
@@ -257,7 +260,7 @@ export class Client extends EventEmitter {
     const op = retry.operation(this.nonceRetryStrategy)
     return new Promise<Uint8Array | void>((resolve, reject) => {
       op.attempt(currentAttempt => {
-        this._commitTxAsync<T>(publicKey, tx, middleware)
+        this._commitTxAsync<T>(localAddress, tx, middleware)
           .then(resolve)
           .catch(err => {
             if (err instanceof Error && err.message === INVALID_TX_NONCE_ERROR) {
@@ -274,13 +277,13 @@ export class Client extends EventEmitter {
   }
 
   private async _commitTxAsync<T extends Message>(
-    publicKey: Uint8Array,
+    localAddress: string,
     tx: T,
     middleware: ITxMiddlewareHandler[]
   ): Promise<Uint8Array | void> {
     let txBytes = tx.serializeBinary()
     for (let i = 0; i < middleware.length; i++) {
-      txBytes = await middleware[i].Handle(txBytes, publicKey)
+      txBytes = await middleware[i].Handle(txBytes, localAddress)
     }
     const result = await this._writeClient.sendAsync<IBroadcastTxCommitResult>(
       'broadcast_tx_commit',
@@ -605,11 +608,17 @@ export class Client extends EventEmitter {
    * @return The nonce.
    */
   getNonceAsync(key: string): Promise<number> {
-    return this.nonceCallback(key);
+    return this._readClient.sendAsync<number>('nonce', { key })
+    //return this.nonceCallback(key);
   }
 
   getNonceAsyncCallback(key: string): Promise<number> {
-    return this._readClient.sendAsync<number>('nonce', { key });
+    const trimmed = key.replace('0x','')
+    return this._readClient.sendAsync<number>('nonce', { trimmed })
+  }
+
+  getPrivateKey(hex: string) {
+    return this.accounts.get(hex)!;
   }
 
   /**
@@ -672,10 +681,18 @@ export class Client extends EventEmitter {
     }
   }
   public caller: Address;
+  readonly accounts: Map<string, Uint8Array>
+
+  public addAccount(privateKey: Uint8Array) {
+    const publicKey = publicKeyFromPrivateKey(privateKey)
+    const accountAddress = LocalAddress.fromPublicKey(publicKey).toString()
+    this.accounts.set(accountAddress, privateKey)
+  }
 
   public getNewCaller() {
     const privKey = CryptoUtils.generatePrivateKey()
     const pubKey = CryptoUtils.publicKeyFromPrivateKey(privKey)
+    this.addAccount(privKey)
     return new Address(this.chainId, LocalAddress.fromPublicKey(pubKey))
   }
 }

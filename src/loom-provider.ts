@@ -22,7 +22,8 @@ import {
   bytesToHexAddr,
   numberToHex,
   bufferToProtobufBytes,
-  publicKeyFromPrivateKey
+  publicKeyFromPrivateKey,
+  bytesToHexAddrLC
 } from './crypto-utils'
 import { CryptoUtils } from '.';
 
@@ -82,10 +83,6 @@ export interface IEthFilterLog {
 const log = debug('loom-provider')
 const error = debug('loom-provider:error')
 
-const bytesToHexAddrLC = (bytes: Uint8Array): string => {
-  return bytesToHexAddr(bytes).toLowerCase()
-}
-
 const numberToHexLC = (num: number): string => {
   return numberToHex(num).toLowerCase()
 }
@@ -132,6 +129,7 @@ export class LoomProvider {
       const accountAddress = LocalAddress.fromPublicKey(publicKey).toString()
       this.accountsAddrList.push(accountAddress)
       this.accounts.set(accountAddress, accountPrivateKey)
+      this._client.addAccount(accountPrivateKey)
       log(`New account added ${accountAddress}`)
     })
   }
@@ -711,7 +709,9 @@ export class LoomProvider {
     const publicKey = CryptoUtils.publicKeyFromPrivateKey(privateKey)
 
     const middleware = createDefaultTxMiddleware(this._client, privateKey)
-    return this._client.commitTxAsync<Transaction>(publicKey, txTransaction, { middleware })
+    const caller = new Address('default', LocalAddress.fromPublicKey(publicKey))
+    
+    return this._client.commitTxAsync<Transaction>(caller.local.toString(), txTransaction, { middleware })
   }
 
   // Basic response to web3js

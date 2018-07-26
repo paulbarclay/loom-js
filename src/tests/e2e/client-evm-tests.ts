@@ -8,12 +8,11 @@ import { bufferToProtobufBytes, bytesToHexAddr } from '../../crypto-utils'
 test('Client EVM test (newBlockEvmFilterAsync)', async t => {
   try {
     const privateKey = CryptoUtils.generatePrivateKey()
-    const publicKey = CryptoUtils.publicKeyFromPrivateKey(privateKey)
-    const client = createTestClient()
+    const client = createTestClient(privateKey)
 
     client.txMiddleware = [
-      new NonceTxMiddleware(publicKey, client),
-      new SignedTxMiddleware(privateKey)
+      new NonceTxMiddleware(client),
+      new SignedTxMiddleware(client)
     ]
 
     // calls newblockevmfilter
@@ -56,12 +55,11 @@ test('Client EVM test (newBlockEvmFilterAsync)', async t => {
 test('Client EVM test (newPendingTransactionEvmFilterAsync)', async t => {
   try {
     const privateKey = CryptoUtils.generatePrivateKey()
-    const publicKey = CryptoUtils.publicKeyFromPrivateKey(privateKey)
-    const client = createTestClient()
+    const client = createTestClient(privateKey)
 
     client.txMiddleware = [
-      new NonceTxMiddleware(publicKey, client),
-      new SignedTxMiddleware(privateKey)
+      new NonceTxMiddleware(client),
+      new SignedTxMiddleware(client)
     ]
 
     // calls newblockevmfilter

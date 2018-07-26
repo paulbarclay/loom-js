@@ -38,7 +38,7 @@ const Web3 = require('web3')
 
 const newContractAndClient = async () => {
   const privKey = CryptoUtils.generatePrivateKey()
-  const client = createTestClient()
+  const client = createTestClient(privKey)
   const from = LocalAddress.fromPublicKey(
     CryptoUtils.publicKeyFromPrivateKey(privKey)
   ).toString()

@@ -14,28 +14,36 @@ export function getTestUrls() {
  * TEST_LOOM_DAPP_WRITE_URL and TEST_LOOM_DAPP_READ_URL. These env vars can be set by modifying
  * the .env.test (see .env.test.example for default values).
  */
-export function createTestClient(): Client {
-  return new Client('default', getTestUrls().wsWriteUrl, getTestUrls().wsReadUrl)
+export function createTestClient(privateKey: Uint8Array): Client {
+  const client = new Client('default', getTestUrls().wsWriteUrl, getTestUrls().wsReadUrl)
+  client.addAccount(privateKey);
+  return client
 }
 
-export function createTestHttpClient(): Client {
+export function createTestHttpClient(privateKey: Uint8Array): Client {
   const writer = createJSONRPCClient({ protocols: [{ url: getTestUrls().httpWriteUrl }] })
   const reader = createJSONRPCClient({ protocols: [{ url: getTestUrls().httpReadUrl }] })
-  return new Client('default', writer, reader)
+  const client = new Client('default', writer, reader)
+  client.addAccount(privateKey)
+  return client
 }
 
-export function createTestWSClient(): Client {
+export function createTestWSClient(privateKey: Uint8Array): Client {
   const writer = createJSONRPCClient({ protocols: [{ url: getTestUrls().wsWriteUrl }] })
   const reader = createJSONRPCClient({ protocols: [{ url: getTestUrls().wsReadUrl }] })
-  return new Client('default', writer, reader)
+  const client = new Client('default', writer, reader)
+  client.addAccount(privateKey)
+  return client
 }
 
-export function createTestHttpWSClient(): Client {
+export function createTestHttpWSClient(privateKey: Uint8Array): Client {
   const writer = createJSONRPCClient({ protocols: [{ url: getTestUrls().httpWriteUrl }] })
   const reader = createJSONRPCClient({
     protocols: [{ url: getTestUrls().httpReadUrl }, { url: getTestUrls().wsReadUrl }]
   })
-  return new Client('default', writer, reader)
+  const client = new Client('default', writer, reader)
+  client.addAccount(privateKey)
+  return client
 }
 
 export function waitForMillisecondsAsync(ms: number) {

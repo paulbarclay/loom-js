@@ -143,7 +143,7 @@ async function testGetLogsAnyPending(t: test.Test, loomProvider: LoomProvider, f
 test('LoomProvider.getEVMLogsAsync', async t => {
   try {
     const privKey = CryptoUtils.generatePrivateKey()
-    const client = createTestClient()
+    const client = createTestClient(privKey)
     const fromAddr = LocalAddress.fromPublicKey(
       CryptoUtils.publicKeyFromPrivateKey(privKey)
     ).toString()

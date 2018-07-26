@@ -19,10 +19,10 @@ import {
 } from '../helpers'
 
 async function getClientAndContract(
-  createClient: () => Client
+  createClient: (privateKey: Uint8Array) => Client
 ): Promise<{ client: Client; contract: Contract }> {
   const privKey = CryptoUtils.generatePrivateKey()
-  const client = createClient()
+  const client = createClient(privKey)
   client.txMiddleware = createDefaultTxMiddleware(client, privKey)
 
   let contractAddr: Address | null = null
@@ -39,7 +39,7 @@ async function getClientAndContract(
   return { client, contract }
 }
 
-async function testContractCalls(t: test.Test, createClient: () => Client) {
+async function testContractCalls(t: test.Test, createClient: (privateKey: Uint8Array) => Client) {
   const { client, contract } = await getClientAndContract(createClient)
   const msgKey = '123'
   const msgValue = '456'
@@ -66,8 +66,13 @@ async function testContractCalls(t: test.Test, createClient: () => Client) {
   client.disconnect()
 }
 
-async function testContractEvents(t: test.Test, createClient: () => Client) {
-  const { client, contract } = await getClientAndContract(createTestClient)
+function getThisTestClient() {
+  const privKey = CryptoUtils.generatePrivateKey()
+  return createTestClient(privKey)
+}
+
+async function testContractEvents(t: test.Test, createClient: (privateKey: Uint8Array) => Client) {
+  const { client, contract } = await getClientAndContract(getThisTestClient)
 
   const msgKey = '123'
   const msgValue = '456'

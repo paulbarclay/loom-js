@@ -37,9 +37,10 @@ import { Address, LocalAddress } from '../../address'
 
 test('Client EVM Event test', async t => {
   try {
+    console.log("start")
     const privateKey = CryptoUtils.generatePrivateKey()
     const publicKey = CryptoUtils.publicKeyFromPrivateKey(privateKey)
-    const client = createTestClient()
+    const client = createTestClient(privateKey)
 
     // Only used for deploy the contract
     const loomProvider = new LoomProvider(client, privateKey)
@@ -53,8 +54,8 @@ test('Client EVM Event test', async t => {
 
     // Middleware used for client
     client.txMiddleware = [
-      new NonceTxMiddleware(publicKey, client),
-      new SignedTxMiddleware(privateKey)
+      new NonceTxMiddleware(client),
+      new SignedTxMiddleware(client)
     ]
 
     // Filter by topics
@@ -82,7 +83,7 @@ test('Client EVM Event test', async t => {
       '60fe47b10000000000000000000000000000000000000000000000000000000000000005',
       'hex'
     )
-
+    
     const callTx = new CallTx()
     callTx.setVmType(VMType.EVM)
     callTx.setInput(bufferToProtobufBytes(data))
@@ -96,7 +97,7 @@ test('Client EVM Event test', async t => {
     tx.setId(2)
     tx.setData(msgTx.serializeBinary())
 
-    await client.commitTxAsync<Transaction>(caller.local.bytes, tx)
+    await client.commitTxAsync<Transaction>(caller.local.toString(), tx)
 
     waitForMillisecondsAsync(2000)
 

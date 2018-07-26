@@ -1,21 +1,21 @@
 import { NonceTx } from '../proto/loom_pb'
 import { ITxMiddlewareHandler, Client } from '../client'
-import { bytesToHex } from '../crypto-utils'
+import { bytesToHex, publicKeyFromPrivateKey } from '../crypto-utils'
 
 /**
  * Wraps data in a NonceTx.
  * The Loom DAppChain keeps track of the nonce of the last committed tx to prevent replay attacks.
  */
 export class NonceTxMiddleware implements ITxMiddlewareHandler {
-  private _publicKey: Uint8Array
   private _client: Client
 
-  constructor(publicKey: Uint8Array, client: Client) {
-    this._publicKey = publicKey
+  constructor(client: Client) {
     this._client = client
   }
 
-  async Handle(txData: Readonly<Uint8Array>, publicKey: Uint8Array): Promise<Uint8Array> {
+  async Handle(txData: Readonly<Uint8Array>, localAddress: string): Promise<Uint8Array> {
+    const privateKey = this._client.getPrivateKey(localAddress)
+    const publicKey = publicKeyFromPrivateKey(privateKey)
     const key = bytesToHex(publicKey)
     const nonce = await this._client.getNonceAsync(key)
     const tx = new NonceTx()
