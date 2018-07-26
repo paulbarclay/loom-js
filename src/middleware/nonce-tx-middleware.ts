@@ -15,8 +15,8 @@ export class NonceTxMiddleware implements ITxMiddlewareHandler {
     this._client = client
   }
 
-  async Handle(txData: Readonly<Uint8Array>): Promise<Uint8Array> {
-    const key = bytesToHex(this._publicKey)
+  async Handle(txData: Readonly<Uint8Array>, publicKey: Uint8Array): Promise<Uint8Array> {
+    const key = bytesToHex(publicKey)
     const nonce = await this._client.getNonceAsync(key)
     const tx = new NonceTx()
     tx.setInner(txData as Uint8Array)

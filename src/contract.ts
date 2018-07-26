@@ -110,7 +110,7 @@ export class Contract extends EventEmitter {
     tx.setId(2)
     tx.setData(msgTx.serializeBinary())
 
-    const result = await this._client.commitTxAsync<Transaction>(tx)
+    const result = await this._client.commitTxAsync<Transaction>(caller.local.bytes, tx)
     if (result && output) {
       const resp = Response.deserializeBinary(bufferToProtobufBytes(result))
       const msgClass = (<any>output).constructor as typeof Message

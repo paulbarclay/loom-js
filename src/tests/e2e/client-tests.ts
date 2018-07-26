@@ -26,14 +26,14 @@ class InvalidNonceTxMiddleware implements ITxMiddlewareHandler {
     this._mw = new NonceTxMiddleware(publicKey, client)
   }
 
-  async Handle(txData: Readonly<Uint8Array>): Promise<Uint8Array> {
+  async Handle(txData: Readonly<Uint8Array>, publicKey: Uint8Array): Promise<Uint8Array> {
     if (this.currentAttempt++ < this.failureCount) {
       const tx = new NonceTx()
       tx.setInner(txData as Uint8Array)
       tx.setSequence(0)
       return tx.serializeBinary()
     } else {
-      return this._mw.Handle(txData)
+      return this._mw.Handle(txData, publicKey)
     }
   }
 }

@@ -96,7 +96,7 @@ test('Client EVM Event test', async t => {
     tx.setId(2)
     tx.setData(msgTx.serializeBinary())
 
-    await client.commitTxAsync<Transaction>(tx)
+    await client.commitTxAsync<Transaction>(caller.local.bytes, tx)
 
     waitForMillisecondsAsync(2000)
 

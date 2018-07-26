@@ -69,7 +69,7 @@ export class EvmContract extends EventEmitter {
     tx.setId(2)
     tx.setData(msgTx.serializeBinary())
 
-    return this._client.commitTxAsync<Transaction>(tx)
+    return this._client.commitTxAsync<Transaction>(caller.local.bytes, tx)
   }
   /**
    * Calls a method of a contract running on an EVM that doesn't mutate state.

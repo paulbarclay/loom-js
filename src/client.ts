@@ -38,7 +38,7 @@ const log = debug('client')
  * Handlers should not modify the original input data in any way.
  */
 export interface ITxMiddlewareHandler {
-  Handle(txData: Readonly<Uint8Array>): Promise<Uint8Array>
+  Handle(txData: Readonly<Uint8Array>, publicKey: Uint8Array): Promise<Uint8Array>
 }
 
 export enum ClientEvent {
@@ -249,6 +249,7 @@ export class Client extends EventEmitter {
    * @returns Result (if any) returned by the tx handler in the contract that processed the tx.
    */
   commitTxAsync<T extends Message>(
+    publicKey: Uint8Array,
     tx: T,
     opts: { middleware?: ITxMiddlewareHandler[] } = {}
   ): Promise<Uint8Array | void> {
@@ -256,7 +257,7 @@ export class Client extends EventEmitter {
     const op = retry.operation(this.nonceRetryStrategy)
     return new Promise<Uint8Array | void>((resolve, reject) => {
       op.attempt(currentAttempt => {
-        this._commitTxAsync<T>(tx, middleware)
+        this._commitTxAsync<T>(publicKey, tx, middleware)
           .then(resolve)
           .catch(err => {
             if (err instanceof Error && err.message === INVALID_TX_NONCE_ERROR) {
@@ -273,12 +274,13 @@ export class Client extends EventEmitter {
   }
 
   private async _commitTxAsync<T extends Message>(
+    publicKey: Uint8Array,
     tx: T,
     middleware: ITxMiddlewareHandler[]
   ): Promise<Uint8Array | void> {
     let txBytes = tx.serializeBinary()
     for (let i = 0; i < middleware.length; i++) {
-      txBytes = await middleware[i].Handle(txBytes)
+      txBytes = await middleware[i].Handle(txBytes, publicKey)
     }
     const result = await this._writeClient.sendAsync<IBroadcastTxCommitResult>(
       'broadcast_tx_commit',

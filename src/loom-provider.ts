@@ -24,6 +24,7 @@ import {
   bufferToProtobufBytes,
   publicKeyFromPrivateKey
 } from './crypto-utils'
+import { CryptoUtils } from '.';
 
 export interface IEthReceipt {
   transactionHash: string
@@ -707,9 +708,10 @@ export class LoomProvider {
     if (!privateKey) {
       throw Error(`Account not found for address ${fromPublicAddr}`)
     }
+    const publicKey = CryptoUtils.publicKeyFromPrivateKey(privateKey)
 
     const middleware = createDefaultTxMiddleware(this._client, privateKey)
-    return this._client.commitTxAsync<Transaction>(txTransaction, { middleware })
+    return this._client.commitTxAsync<Transaction>(publicKey, txTransaction, { middleware })
   }
 
   // Basic response to web3js
