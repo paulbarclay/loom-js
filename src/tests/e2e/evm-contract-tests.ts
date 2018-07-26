@@ -42,7 +42,6 @@ test('EVM Contract Calls', async t => {
     const callerAddr = new Address(client.chainId, LocalAddress.fromPublicKey(pubKey))
     const evmContract = new EvmContract({
       contractAddr,
-      callerAddr,
       client
     })
 
@@ -89,7 +88,7 @@ test('EVM Contract Calls', async t => {
     let results: Uint8Array[] = []
     let rtv
     for (let i = 0; i < numRepeats; i++) {
-      rtv = await evmContract.callAsync(inputSet987Array)
+      rtv = await evmContract.callAsync(client.caller, inputSet987Array)
       if (rtv) {
         for (let result of results) {
           t.notDeepEqual(result, rtv, 'A different tx hash sould be returned' + ' each time')
@@ -114,7 +113,7 @@ test('EVM Contract Calls', async t => {
       }
     }
 
-    const staticCallRtv = await evmContract.staticCallAsync(inputGetArray)
+    const staticCallRtv = await evmContract.staticCallAsync(client.caller, inputGetArray)
     if (staticCallRtv) {
       t.deepEqual(
         staticCallRtv,

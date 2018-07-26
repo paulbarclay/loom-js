@@ -128,6 +128,7 @@ export class Client extends EventEmitter {
 
   private _writeClient: IJSONRPCClient
   private _readClient!: IJSONRPCClient
+  private nonceCallback: Function
 
   /** Middleware to apply to transactions before they are transmitted to the DAppChain. */
   txMiddleware: ITxMiddlewareHandler[] = []
@@ -160,7 +161,7 @@ export class Client extends EventEmitter {
    * @param readUrl Host & port of the DAppChain read/query interface, this should only be provided
    *                if it's not the same as `writeUrl`.
    */
-  constructor(chainId: string, writeUrl: string, readUrl?: string)
+  constructor(chainId: string, writeUrl: string, readUrl?: string, nonceCallback?: Function)
   /**
    * Constructs a new client to read & write data from/to a Loom DAppChain.
    * @param chainId DAppChain identifier.
@@ -168,11 +169,12 @@ export class Client extends EventEmitter {
    * @param readClient RPC client to use to query the DAppChain and listen to DAppChain events, this
    *                   should only be provided if it's not the same as `writeClient`.
    */
-  constructor(chainId: string, writeClient: IJSONRPCClient, readClient?: IJSONRPCClient)
+  constructor(chainId: string, writeClient: IJSONRPCClient, readClient?: IJSONRPCClient, nonceCallback?: Function)
   constructor(
     chainId: string,
     writeClient: IJSONRPCClient | string,
-    readClient?: IJSONRPCClient | string
+    readClient?: IJSONRPCClient | string,
+    nonceCallback?: Function,
   ) {
     super()
     this.chainId = chainId
@@ -218,6 +220,7 @@ export class Client extends EventEmitter {
         this._readClient.removeListener(RPCClientEvent.Message, emitContractEvent)
       }
     })
+    this.nonceCallback = nonceCallback ? nonceCallback : this.getNonceAsyncCallback;
     this.caller = this.getNewCaller()
   }
 
@@ -600,7 +603,11 @@ export class Client extends EventEmitter {
    * @return The nonce.
    */
   getNonceAsync(key: string): Promise<number> {
-    return this._readClient.sendAsync<number>('nonce', { key })
+    return this.nonceCallback(key);
+  }
+
+  getNonceAsyncCallback(key: string): Promise<number> {
+    return this._readClient.sendAsync<number>('nonce', { key });
   }
 
   /**

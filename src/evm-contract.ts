@@ -20,7 +20,6 @@ export class EvmContract extends EventEmitter {
   private _client: Client
 
   address: Address
-  caller: Address
 
   /**
    * @param params Parameters.
@@ -29,11 +28,10 @@ export class EvmContract extends EventEmitter {
    *                           e.g. `new Address(client.chainId, LocalAddress.fromPublicKey(pubKey))`
    * @param params.client: Client to use to communicate with the contract.
    */
-  constructor(params: { contractAddr: Address; callerAddr: Address; client: Client }) {
+  constructor(params: { contractAddr: Address; client: Client }) {
     super()
     this._client = params.client
     this.address = params.contractAddr
-    this.caller = params.callerAddr
 
     const emitContractEvent = this._emitContractEvent.bind(this)
 
@@ -56,14 +54,14 @@ export class EvmContract extends EventEmitter {
    * @param args ABI encoded function signature and input paramters.
    * @returns A promise that will be resolved with return value (if any) of the contract method.
    */
-  async callAsync(args: number[], output?: Uint8Array): Promise<Uint8Array | void> {
+  async callAsync(caller: Address, args: number[], output?: Uint8Array): Promise<Uint8Array | void> {
     const ui8InData = Uint8Array.from(args)
     const callTx = new CallTx()
     callTx.setVmType(VMType.EVM)
     callTx.setInput(ui8InData)
 
     const msgTx = new MessageTx()
-    msgTx.setFrom(this.caller.MarshalPB())
+    msgTx.setFrom(caller.MarshalPB())
     msgTx.setTo(this.address.MarshalPB())
     msgTx.setData(callTx.serializeBinary())
 
@@ -79,9 +77,9 @@ export class EvmContract extends EventEmitter {
    * @param args ABI encoded function signature and input paramters.
    * @returns A promise that will be resolved with the return value of the contract method.
    */
-  async staticCallAsync(args: number[], output?: Uint8Array): Promise<Uint8Array | void> {
+  async staticCallAsync(caller: Address, args: number[], output?: Uint8Array): Promise<Uint8Array | void> {
     const ui8InData = Uint8Array.from(args)
-    return this._client.queryAsync(this.address, ui8InData, VMType.EVM, this.caller)
+    return this._client.queryAsync(this.address, ui8InData, VMType.EVM, caller)
   }
 
   private _emitContractEvent(event: IChainEventArgs) {
