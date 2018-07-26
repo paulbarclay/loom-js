@@ -16,6 +16,7 @@ import { Uint8ArrayToB64, B64ToUint8Array, bufferToProtobufBytes } from './crypt
 import { Address, LocalAddress } from './address'
 import { WSRPCClient, IJSONRPCEvent } from './internal/ws-rpc-client'
 import { RPCClientEvent, IJSONRPCClient } from './internal/json-rpc-client'
+import { CryptoUtils } from '.';
 
 interface ITxHandlerResult {
   code?: number
@@ -217,6 +218,7 @@ export class Client extends EventEmitter {
         this._readClient.removeListener(RPCClientEvent.Message, emitContractEvent)
       }
     })
+    this.caller = this.getNewCaller()
   }
 
   /**
@@ -659,5 +661,12 @@ export class Client extends EventEmitter {
       const eventArgs: IClientEventArgs = { kind, url }
       this.emit(kind, eventArgs)
     }
+  }
+  public caller: Address;
+
+  public getNewCaller() {
+    const privKey = CryptoUtils.generatePrivateKey()
+    const pubKey = CryptoUtils.publicKeyFromPrivateKey(privKey)
+    return new Address(this.chainId, LocalAddress.fromPublicKey(pubKey))
   }
 }

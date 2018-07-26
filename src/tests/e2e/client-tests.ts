@@ -52,7 +52,7 @@ test('Client nonce retry strategy', async t => {
       throw new Error('Failed to resolve contract address')
     }
     const callerAddr = new Address(client.chainId, LocalAddress.fromPublicKey(pubKey))
-    const contract = new Contract({ contractAddr, callerAddr, client })
+    const contract = new Contract({ contractAddr, client })
 
     const msgKey = '123'
     const msgValue = '456'
@@ -65,7 +65,7 @@ test('Client nonce retry strategy', async t => {
     client.nonceRetryStrategy.retries = 0
 
     try {
-      await contract.callAsync<void>('SetMsg', msg)
+      await contract.callAsync<void>(callerAddr, 'SetMsg', msg)
     } catch (err) {
       if (!isInvalidTxNonceError(err)) {
         throw err
@@ -81,7 +81,7 @@ test('Client nonce retry strategy', async t => {
     nonceMiddlware.currentAttempt = 0
     client.nonceRetryStrategy.retries = 1
 
-    await contract.callAsync<void>('SetMsg', msg)
+    await contract.callAsync<void>(callerAddr, 'SetMsg', msg)
     t.isEqual(
       nonceMiddlware.currentAttempt,
       2,
@@ -94,7 +94,7 @@ test('Client nonce retry strategy', async t => {
 
     let failed = false
     try {
-      await contract.callAsync<void>('SetMsg', msg)
+      await contract.callAsync<void>(callerAddr, 'SetMsg', msg)
     } catch (err) {
       failed = true
       if (!isInvalidTxNonceError(err)) {
@@ -116,7 +116,7 @@ test('Client nonce retry strategy', async t => {
     nonceMiddlware.currentAttempt = 0
     client.nonceRetryStrategy.retries = 2
 
-    await contract.callAsync<void>('SetMsg', msg)
+    await contract.callAsync<void>(callerAddr, 'SetMsg', msg)
     t.isEqual(
       nonceMiddlware.currentAttempt,
       3,

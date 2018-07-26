@@ -1,3 +1,5 @@
+// Modified - uses
+
 import { Message } from 'google-protobuf'
 import EventEmitter from 'events'
 
@@ -39,7 +41,6 @@ export class Contract extends EventEmitter {
 
   name?: string
   address: Address
-  caller: Address
 
   /**
    * @param params Parameters.
@@ -52,14 +53,12 @@ export class Contract extends EventEmitter {
   constructor(params: {
     contractAddr: Address
     contractName?: string
-    callerAddr: Address
     client: Client
   }) {
     super()
     this._client = params.client
     this.name = params.contractName
     this.address = params.contractAddr
-    this.caller = params.callerAddr
 
     const emitContractEvent = this._emitContractEvent.bind(this)
 
@@ -84,6 +83,7 @@ export class Contract extends EventEmitter {
    * @returns A promise that will be resolved with return value (if any) of the contract method.
    */
   async callAsync<T extends Message | void>(
+    caller: Address,
     method: string,
     args: Message,
     output?: T
@@ -102,7 +102,7 @@ export class Contract extends EventEmitter {
     callTx.setInput(request.serializeBinary())
 
     const msgTx = new MessageTx()
-    msgTx.setFrom(this.caller.MarshalPB())
+    msgTx.setFrom(caller.MarshalPB())
     msgTx.setTo(this.address.MarshalPB())
     msgTx.setData(callTx.serializeBinary())
 
@@ -126,7 +126,7 @@ export class Contract extends EventEmitter {
    * @param args Arguments to pass to the contract method.
    * @returns A promise that will be resolved with the return value of the contract method.
    */
-  async staticCallAsync<T extends Message>(method: string, args: Message, output: T): Promise<T> {
+  async staticCallAsync<T extends Message>(caller: Address, method: string, args: Message, output: T): Promise<T> {
     const query = new ContractMethodCall()
     query.setMethod(method)
     query.setArgs(args.serializeBinary())
@@ -134,7 +134,7 @@ export class Contract extends EventEmitter {
       this.address,
       query.serializeBinary(),
       VMType.PLUGIN,
-      this.caller
+      caller
     )
     if (result && output) {
       const msgClass = (<any>output).constructor as typeof Message

@@ -42,7 +42,8 @@ export class PlasmaCashTx {
       this.denomination.toNumber(),
       this.newOwner
     ]
-    return '0x' + rlp.encode(data).toString('hex')
+    console.log("This is screwed up");
+    return '0x' //+ rlp.encode(data).toString('hex')
   }
 
   /**

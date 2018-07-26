@@ -38,7 +38,6 @@ export class DAppChainPlasmaClient {
       this._plasmaContract = new Contract({
         contractAddr: addr,
         contractName: this._plasmaContractName,
-        callerAddr: this._callerAddress,
         client: this._dAppClient
       })
     }
@@ -52,6 +51,7 @@ export class DAppChainPlasmaClient {
     const contract = await this._resolvePlasmaContractAsync()
     const req = new GetCurrentBlockRequest()
     const resp = await contract.staticCallAsync<GetCurrentBlockResponse>(
+      this._callerAddress,
       'GetCurrentBlockRequest',
       req,
       new GetCurrentBlockResponse()
@@ -73,6 +73,7 @@ export class DAppChainPlasmaClient {
     const req = new GetBlockRequest()
     req.setBlockHeight(marshalBigUIntPB(blockNum))
     const resp = await contract.staticCallAsync<GetBlockResponse>(
+      this._callerAddress,
       'GetBlockRequest',
       req,
       new GetBlockResponse()
@@ -90,7 +91,10 @@ export class DAppChainPlasmaClient {
     const contract = await this._resolvePlasmaContractAsync()
     const req = new PlasmaTxRequest()
     req.setPlasmatx(marshalPlasmaTxPB(tx))
-    await contract.callAsync('PlasmaTxRequest', req)
+    await contract.callAsync(
+      this._callerAddress,
+      'PlasmaTxRequest',
+      req)
   }
 
   /**
@@ -102,7 +106,10 @@ export class DAppChainPlasmaClient {
   async debugFinalizeBlockAsync(): Promise<void> {
     const contract = await this._resolvePlasmaContractAsync()
     const req = new SubmitBlockToMainnetRequest()
-    await contract.callAsync('SubmitBlockToMainnet', req)
+    await contract.callAsync(
+      this._callerAddress,
+      'SubmitBlockToMainnet',
+      req)
   }
 
   /**
@@ -119,6 +126,9 @@ export class DAppChainPlasmaClient {
     req.setDepositBlock(marshalBigUIntPB(tx.prevBlockNum))
     req.setDenomination(marshalBigUIntPB(tx.denomination))
     req.setFrom(owner.MarshalPB())
-    await contract.callAsync('DepositRequest', req)
+    await contract.callAsync(
+      this._callerAddress,
+      'DepositRequest',
+      req)
   }
 }
