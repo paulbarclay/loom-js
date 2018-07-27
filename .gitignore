@@ -5,7 +5,7 @@ node_modules
 
 # Only apps should have lockfiles
 package-lock.json
-/dist/*
+# we can dl this from github /dist/*
 loom.umd.js
 /.env.test
 /yarn-error.log
