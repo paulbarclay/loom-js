@@ -721,10 +721,12 @@ var Client = /** @class */ (function (_super) {
     Client.prototype._emitNetEvent = function (url, kind, error) {
         if (kind === ClientEvent.Error) {
             var eventArgs = { kind: kind, url: url, error: error };
+            console.log("emitNetEvent ERROR: url:" + url + " kind:" + kind + " error:" + JSON.stringify(eventArgs));
             this.emit(kind, eventArgs);
         }
         else {
             var eventArgs = { kind: kind, url: url };
+            console.log("emitNetEvent: url:" + url + " kind:" + kind + " args:" + JSON.stringify(eventArgs));
             this.emit(kind, eventArgs);
         }
     };

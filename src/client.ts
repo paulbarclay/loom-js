@@ -674,9 +674,11 @@ export class Client extends EventEmitter {
   ) {
     if (kind === ClientEvent.Error) {
       const eventArgs: IClientErrorEventArgs = { kind, url, error }
+      console.log(`emitNetEvent ERROR: url:${url} kind:${kind} error:${JSON.stringify(eventArgs)}`)
       this.emit(kind, eventArgs)
     } else {
       const eventArgs: IClientEventArgs = { kind, url }
+      console.log(`emitNetEvent: url:${url} kind:${kind} args:${JSON.stringify(eventArgs)}`)
       this.emit(kind, eventArgs)
     }
   }
