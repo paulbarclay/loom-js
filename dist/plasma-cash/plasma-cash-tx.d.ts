@@ -9,6 +9,10 @@ export declare class PlasmaCashTx {
      * Hex-encoded Ethereum address of the new owner of the Plasma token.
      */
     newOwner: string;
+    /**
+     * Hex-encoded Ethereum address of the previous owner of the Plasma token.
+     */
+    prevOwner?: string;
     sigBytes?: Uint8Array;
     proofBytes?: Uint8Array;
     constructor(params: {
@@ -16,6 +20,7 @@ export declare class PlasmaCashTx {
         prevBlockNum: BN;
         denomination: BN | number;
         newOwner: string;
+        prevOwner?: string;
         sig?: Uint8Array;
         proof?: Uint8Array;
     });

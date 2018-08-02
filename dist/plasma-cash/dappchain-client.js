@@ -55,7 +55,7 @@ var DAppChainPlasmaClient = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         if (!!this._plasmaContract) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this._dAppClient.getContractAddressAsync('plasmacash')];
+                        return [4 /*yield*/, this._dAppClient.getContractAddressAsync(this._plasmaContractName)];
                     case 1:
                         addr = _a.sent();
                         if (!addr) {
@@ -173,20 +173,22 @@ var DAppChainPlasmaClient = /** @class */ (function () {
      * This method is only provided for debugging & testing, in practice only DAppChain Plasma Oracles
      * will be permitted to make this request.
      */
-    DAppChainPlasmaClient.prototype.debugSubmitDepositAsync = function (tx) {
+    DAppChainPlasmaClient.prototype.debugSubmitDepositAsync = function (deposit) {
         return __awaiter(this, void 0, void 0, function () {
-            var contract, owner, req;
+            var contract, ownerAddr, tokenAddr, req;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this._resolvePlasmaContractAsync()];
                     case 1:
                         contract = _a.sent();
-                        owner = new address_1.Address('eth', address_1.LocalAddress.fromHexString(tx.newOwner));
+                        ownerAddr = new address_1.Address('eth', address_1.LocalAddress.fromHexString(deposit.from));
+                        tokenAddr = new address_1.Address('eth', address_1.LocalAddress.fromHexString(deposit.contractAddress));
                         req = new plasma_cash_pb_1.DepositRequest();
-                        req.setSlot(tx.slot.toString(10));
-                        req.setDepositBlock(big_uint_1.marshalBigUIntPB(tx.prevBlockNum));
-                        req.setDenomination(big_uint_1.marshalBigUIntPB(tx.denomination));
-                        req.setFrom(owner.MarshalPB());
+                        req.setSlot(deposit.slot.toString(10));
+                        req.setDepositBlock(big_uint_1.marshalBigUIntPB(deposit.blockNumber));
+                        req.setDenomination(big_uint_1.marshalBigUIntPB(deposit.denomination));
+                        req.setFrom(ownerAddr.MarshalPB());
+                        req.setContract(tokenAddr.MarshalPB());
                         return [4 /*yield*/, contract.callAsync(this._callerAddress, 'DepositRequest', req)];
                     case 2:
                         _a.sent();

@@ -58,6 +58,7 @@ export declare class Entity {
     }): Promise<object>;
     respondChallengeBeforeAsync(params: {
         slot: BN;
-        challengingBlockNum: BN;
+        challengingTxHash: string;
+        respondingBlockNum: BN;
     }): Promise<object>;
 }

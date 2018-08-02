@@ -19,7 +19,7 @@ function getWeb3Connection() {
 }
 
 async function getClientAndContract(
-  createClient: () => Client
+  createClient: (privateKey: Uint8Array) => Client
 ): Promise<{
   client: Client
   addressMapper: AddressMapper
@@ -27,7 +27,7 @@ async function getClientAndContract(
 }> {
   const privKey = CryptoUtils.generatePrivateKey()
   const pubKey = CryptoUtils.publicKeyFromPrivateKey(privKey)
-  const client = createClient()
+  const client = createClient(privKey)
   client.txMiddleware = createDefaultTxMiddleware(client, privKey)
 
   const addressMapper = await AddressMapper.createAsync(
@@ -38,7 +38,7 @@ async function getClientAndContract(
   return { client, addressMapper, pubKey }
 }
 
-async function testAddMapping(t: test.Test, createClient: () => Client) {
+async function testAddMapping(t: test.Test, createClient: (privateKey: Uint8Array) => Client) {
   const { client, addressMapper, pubKey } = await getClientAndContract(createClient)
 
   const ethAddress = '0xEf90a80506682b2bb7680166694a2d37d9cBf44a'
@@ -55,7 +55,7 @@ async function testAddMapping(t: test.Test, createClient: () => Client) {
   client.disconnect()
 }
 
-async function testAddIdentity(t: test.Test, createClient: () => Client) {
+async function testAddIdentity(t: test.Test, createClient: (privateKey: Uint8Array) => Client) {
   const { client, addressMapper, pubKey } = await getClientAndContract(createClient)
 
   const ethAddress = '0x80a4B6Da5143a59C538FBBb794Be260382B38F58'

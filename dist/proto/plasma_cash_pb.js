@@ -2161,7 +2161,8 @@ proto.DepositRequest.toObject = function(includeInstance, msg) {
     slot: jspb.Message.getFieldWithDefault(msg, 1, "0"),
     depositBlock: (f = msg.getDepositBlock()) && proto_loom_pb.BigUInt.toObject(includeInstance, f),
     denomination: (f = msg.getDenomination()) && proto_loom_pb.BigUInt.toObject(includeInstance, f),
-    from: (f = msg.getFrom()) && proto_loom_pb.Address.toObject(includeInstance, f)
+    from: (f = msg.getFrom()) && proto_loom_pb.Address.toObject(includeInstance, f),
+    contract: (f = msg.getContract()) && proto_loom_pb.Address.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -2216,6 +2217,11 @@ proto.DepositRequest.deserializeBinaryFromReader = function(msg, reader) {
       var value = new proto_loom_pb.Address;
       reader.readMessage(value,proto_loom_pb.Address.deserializeBinaryFromReader);
       msg.setFrom(value);
+      break;
+    case 5:
+      var value = new proto_loom_pb.Address;
+      reader.readMessage(value,proto_loom_pb.Address.deserializeBinaryFromReader);
+      msg.setContract(value);
       break;
     default:
       reader.skipField();
@@ -2273,6 +2279,14 @@ proto.DepositRequest.serializeBinaryToWriter = function(message, writer) {
   if (f != null) {
     writer.writeMessage(
       4,
+      f,
+      proto_loom_pb.Address.serializeBinaryToWriter
+    );
+  }
+  f = message.getContract();
+  if (f != null) {
+    writer.writeMessage(
+      5,
       f,
       proto_loom_pb.Address.serializeBinaryToWriter
     );
@@ -2382,6 +2396,36 @@ proto.DepositRequest.prototype.clearFrom = function() {
  */
 proto.DepositRequest.prototype.hasFrom = function() {
   return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * optional Address contract = 5;
+ * @return {?proto.Address}
+ */
+proto.DepositRequest.prototype.getContract = function() {
+  return /** @type{?proto.Address} */ (
+    jspb.Message.getWrapperField(this, proto_loom_pb.Address, 5));
+};
+
+
+/** @param {?proto.Address|undefined} value */
+proto.DepositRequest.prototype.setContract = function(value) {
+  jspb.Message.setWrapperField(this, 5, value);
+};
+
+
+proto.DepositRequest.prototype.clearContract = function() {
+  this.setContract(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.DepositRequest.prototype.hasContract = function() {
+  return jspb.Message.getField(this, 5) != null;
 };
 
 

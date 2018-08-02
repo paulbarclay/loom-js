@@ -115,7 +115,8 @@ var newContractAndClient = function () { return __awaiter(_this, void 0, void 0,
                 result = _a.sent();
                 contract = new web3.eth.Contract(ABI, result.contractAddress, { from: from });
                 return [2 /*return*/, {
-                        contract: contract, client: client
+                        contract: contract,
+                        client: client
                     }];
         }
     });

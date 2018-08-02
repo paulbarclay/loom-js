@@ -20,6 +20,14 @@ export interface IPlasmaCoin {
     contractAddress: string;
     state: PlasmaCoinState;
 }
+export interface IPlasmaChallenge {
+    slot: BN;
+    txHash: string;
+}
+export declare function marshalChallengeEvent(data: {
+    slot: string;
+    txHash: string;
+}): IPlasmaChallenge;
 export interface IPlasmaDeposit {
     slot: BN;
     blockNumber: BN;
@@ -63,6 +71,12 @@ export interface IPlasmaChallengeBeforeParams extends ISendTxOptions {
     challengingBlockNum: BN;
     prevTx?: PlasmaCashTx;
     prevBlockNum?: BN;
+}
+export interface IPlasmaRspondChallengeBeforeParams extends ISendTxOptions {
+    slot: BN;
+    challengingTxHash: string;
+    respondingBlockNum: BN;
+    respondingTx: PlasmaCashTx;
 }
 export declare class EthereumPlasmaClient {
     private _web3;
@@ -118,7 +132,7 @@ export declare class EthereumPlasmaClient {
      *
      * @returns Web3 tx receipt object.
      */
-    respondChallengeBeforeAsync(params: IPlasmaChallengeParams): Promise<object>;
+    respondChallengeBeforeAsync(params: IPlasmaRspondChallengeBeforeParams): Promise<object>;
     /**
      * Submits a Plasma block to the Plasma Cash Solidity contract on Ethereum.
      *

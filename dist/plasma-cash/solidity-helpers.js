@@ -69,19 +69,25 @@ var Web3Signer = /** @class */ (function () {
      */
     Web3Signer.prototype.signAsync = function (msg) {
         return __awaiter(this, void 0, void 0, function () {
-            var signature, sig, r, s, v, mode;
+            var signature, sig, mode, r, s, v;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this._web3.eth.sign(msg, this._address)];
                     case 1:
                         signature = _a.sent();
                         sig = signature.slice(2);
+                        mode = 1 // Geth
+                        ;
                         r = ethereumjs_util_1.default.toBuffer('0x' + sig.substring(0, 64));
                         s = ethereumjs_util_1.default.toBuffer('0x' + sig.substring(64, 128));
-                        v = ethereumjs_util_1.default.toBuffer(parseInt(sig.substring(128, 130), 16) + 27);
-                        mode = ethereumjs_util_1.default.toBuffer(1) // mode = geth
-                        ;
-                        return [2 /*return*/, Buffer.concat([mode, r, s, v])];
+                        v = parseInt(sig.substring(128, 130), 16);
+                        if (v === 0 || v === 1) {
+                            v += 27;
+                        }
+                        else {
+                            mode = 0; // indicate that msg wasn't prefixed before signing (MetaMask doesn't prefix!)
+                        }
+                        return [2 /*return*/, Buffer.concat([ethereumjs_util_1.default.toBuffer(mode), r, s, ethereumjs_util_1.default.toBuffer(v)])];
                 }
             });
         });

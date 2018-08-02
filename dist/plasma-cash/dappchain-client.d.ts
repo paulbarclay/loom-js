@@ -3,6 +3,7 @@ import { Client } from '../client';
 import { Address } from '../address';
 import { PlasmaCashTx } from './plasma-cash-tx';
 import { PlasmaCashBlock } from './plasma-cash-block';
+import { IPlasmaDeposit } from './ethereum-client';
 export declare class DAppChainPlasmaClient {
     private _dAppClient;
     private _plasmaContract?;
@@ -41,5 +42,5 @@ export declare class DAppChainPlasmaClient {
      * This method is only provided for debugging & testing, in practice only DAppChain Plasma Oracles
      * will be permitted to make this request.
      */
-    debugSubmitDepositAsync(tx: PlasmaCashTx): Promise<void>;
+    debugSubmitDepositAsync(deposit: IPlasmaDeposit): Promise<void>;
 }

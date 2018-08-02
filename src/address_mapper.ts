@@ -21,7 +21,6 @@ export class AddressMapper {
 
     const contract = new Contract({
       contractAddr,
-      callerAddr,
       client
     })
 
@@ -37,6 +36,7 @@ export class AddressMapper {
     mappingContractRequest.setFrom(from.MarshalPB())
     mappingContractRequest.setTo(to.MarshalPB())
     return this._addressMapperContract.callAsync<void>(
+      from,
       'AddContractMapping',
       mappingContractRequest
     )
@@ -47,6 +47,7 @@ export class AddressMapper {
     getMappingRequest.setFrom(from.MarshalPB())
 
     const result = await this._addressMapperContract.staticCallAsync(
+      from,
       'GetMapping',
       getMappingRequest,
       new AddressMapperGetMappingResponse()
@@ -76,6 +77,7 @@ export class AddressMapper {
     mappingIdentityRequest.setSignature(sign)
 
     return this._addressMapperContract.callAsync<void>(
+      from,
       'AddIdentityMapping',
       mappingIdentityRequest
     )

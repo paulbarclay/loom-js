@@ -50,6 +50,7 @@ var PlasmaCashTx = /** @class */ (function () {
         this.prevBlockNum = params.prevBlockNum;
         this.denomination = new bn_js_1.default(params.denomination);
         this.newOwner = params.newOwner;
+        this.prevOwner = params.prevOwner;
         this.sigBytes = params.sig;
         this.proofBytes = params.proof;
     }
@@ -61,7 +62,7 @@ var PlasmaCashTx = /** @class */ (function () {
             this.newOwner
         ];
         console.log("This is screwed up");
-        return '0x' + rlp.encode(data).toString('hex')
+        return '0x'; //+ rlp.encode(data).toString('hex')
     };
     Object.defineProperty(PlasmaCashTx.prototype, "sig", {
         /**
@@ -134,6 +135,10 @@ function unmarshalPlasmaTxPB(rawTx) {
         sig: rawTx.getSignature_asU8(),
         proof: rawTx.getProof_asU8()
     });
+    var sender = rawTx.getSender();
+    if (sender) {
+        tx.prevOwner = address_1.Address.UmarshalPB(sender).local.toString();
+    }
     return tx;
 }
 exports.unmarshalPlasmaTxPB = unmarshalPlasmaTxPB;
@@ -147,6 +152,10 @@ function marshalPlasmaTxPB(tx) {
     pb.setPreviousBlock(big_uint_1.marshalBigUIntPB(tx.prevBlockNum));
     pb.setDenomination(big_uint_1.marshalBigUIntPB(tx.denomination));
     pb.setNewOwner(owner.MarshalPB());
+    if (tx.prevOwner) {
+        var sender = new address_1.Address('eth', address_1.LocalAddress.fromHexString(tx.prevOwner));
+        pb.setSender(sender.MarshalPB());
+    }
     if (tx.sigBytes) {
         pb.setSignature(crypto_utils_1.bufferToProtobufBytes(tx.sigBytes));
     }

@@ -56,6 +56,14 @@ var PlasmaCoinState;
     PlasmaCoinState[PlasmaCoinState["Challenged"] = 2] = "Challenged";
     PlasmaCoinState[PlasmaCoinState["Exited"] = 3] = "Exited";
 })(PlasmaCoinState = exports.PlasmaCoinState || (exports.PlasmaCoinState = {}));
+function marshalChallengeEvent(data) {
+    var slot = data.slot, txHash = data.txHash;
+    return {
+        slot: new bn_js_1.default(slot),
+        txHash: txHash
+    };
+}
+exports.marshalChallengeEvent = marshalChallengeEvent;
 // TODO: This probably shouldn't be exposed, instead add API to EthereumPlasmaClient to retrieve
 // already marshalled event data
 function marshalDepositEvent(data) {
@@ -185,10 +193,10 @@ var EthereumPlasmaClient = /** @class */ (function () {
      * @returns Web3 tx receipt object.
      */
     EthereumPlasmaClient.prototype.respondChallengeBeforeAsync = function (params) {
-        var slot = params.slot, challengingBlockNum = params.challengingBlockNum, challengingTx = params.challengingTx, rest = __rest(params, ["slot", "challengingBlockNum", "challengingTx"]);
-        var txBytes = challengingTx.rlpEncode();
+        var slot = params.slot, challengingTxHash = params.challengingTxHash, respondingBlockNum = params.respondingBlockNum, respondingTx = params.respondingTx, rest = __rest(params, ["slot", "challengingTxHash", "respondingBlockNum", "respondingTx"]);
+        var respondingTxBytes = respondingTx.rlpEncode();
         return this._plasmaContract.methods
-            .respondChallengeBefore(slot, challengingBlockNum, txBytes, challengingTx.proof, challengingTx.sig)
+            .respondChallengeBefore(slot, challengingTxHash, respondingBlockNum, respondingTxBytes, respondingTx.proof, respondingTx.sig)
             .send(rest);
     };
     /**

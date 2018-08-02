@@ -6,6 +6,7 @@ require("./e2e/client-evm-tests");
 require("./e2e/client-evm-event-tests");
 require("./e2e/contract-tests");
 require("./e2e/evm-contract-tests");
+require("./e2e/address-mapper-tests");
 require("./e2e/loom-provider-web3-tests");
 require("./e2e/loom-provider-tests");
 require("./e2e/loom-provider-eth-get-logs");

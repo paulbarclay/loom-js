@@ -81,7 +81,8 @@ var Entity = /** @class */ (function () {
                             slot: slot,
                             prevBlockNum: prevBlockNum,
                             denomination: denomination,
-                            newOwner: newOwner.ethAddress
+                            newOwner: newOwner.ethAddress,
+                            prevOwner: this.ethAddress
                         });
                         return [4 /*yield*/, tx.signAsync(new solidity_helpers_1.Web3Signer(this._web3, this.ethAddress))];
                     case 1:
@@ -120,24 +121,7 @@ var Entity = /** @class */ (function () {
         });
     };
     Entity.prototype.submitPlasmaDepositAsync = function (deposit) {
-        return __awaiter(this, void 0, void 0, function () {
-            var tx;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        tx = new plasma_cash_tx_1.PlasmaCashTx({
-                            slot: deposit.slot,
-                            prevBlockNum: deposit.blockNumber,
-                            denomination: deposit.denomination,
-                            newOwner: deposit.from
-                        });
-                        return [4 /*yield*/, this._dAppPlasmaClient.debugSubmitDepositAsync(tx)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
+        return this._dAppPlasmaClient.debugSubmitDepositAsync(deposit);
     };
     Entity.prototype.startExitAsync = function (params) {
         return __awaiter(this, void 0, void 0, function () {
@@ -166,18 +150,14 @@ var Entity = /** @class */ (function () {
                     case 2: return [4 /*yield*/, this._dAppPlasmaClient.getPlasmaBlockAtAsync(exitBlockNum)];
                     case 3:
                         exitBlock = _a.sent();
-                        return [4 /*yield*/, exitBlock.findTxWithSlot(slot)];
-                    case 4:
-                        exitTx = _a.sent();
+                        exitTx = exitBlock.findTxWithSlot(slot);
                         if (!exitTx) {
                             throw new Error("Invalid exit block: missing tx for slot " + slot.toString(10) + ".");
                         }
                         return [4 /*yield*/, this._dAppPlasmaClient.getPlasmaBlockAtAsync(prevBlockNum)];
-                    case 5:
+                    case 4:
                         prevBlock = _a.sent();
-                        return [4 /*yield*/, prevBlock.findTxWithSlot(slot)];
-                    case 6:
-                        prevTx = _a.sent();
+                        prevTx = prevBlock.findTxWithSlot(slot);
                         if (!prevTx) {
                             throw new Error("Invalid prev block: missing tx for slot " + slot.toString(10) + ".");
                         }
@@ -223,9 +203,7 @@ var Entity = /** @class */ (function () {
                         return [4 /*yield*/, this._dAppPlasmaClient.getPlasmaBlockAtAsync(challengingBlockNum)];
                     case 1:
                         challengingBlock = _a.sent();
-                        return [4 /*yield*/, challengingBlock.findTxWithSlot(slot)];
-                    case 2:
-                        challengingTx = _a.sent();
+                        challengingTx = challengingBlock.findTxWithSlot(slot);
                         if (!challengingTx) {
                             throw new Error("Invalid challenging block: missing tx for slot " + slot.toString(10) + ".");
                         }
@@ -250,9 +228,7 @@ var Entity = /** @class */ (function () {
                         return [4 /*yield*/, this._dAppPlasmaClient.getPlasmaBlockAtAsync(challengingBlockNum)];
                     case 1:
                         challengingBlock = _a.sent();
-                        return [4 /*yield*/, challengingBlock.findTxWithSlot(slot)];
-                    case 2:
-                        challengingTx = _a.sent();
+                        challengingTx = challengingBlock.findTxWithSlot(slot);
                         if (!challengingTx) {
                             throw new Error("Invalid challenging block: missing tx for slot " + slot.toString(10) + ".");
                         }
@@ -294,18 +270,14 @@ var Entity = /** @class */ (function () {
                     case 2: return [4 /*yield*/, this._dAppPlasmaClient.getPlasmaBlockAtAsync(challengingBlockNum)];
                     case 3:
                         exitBlock = _a.sent();
-                        return [4 /*yield*/, exitBlock.findTxWithSlot(slot)];
-                    case 4:
-                        challengingTx = _a.sent();
+                        challengingTx = exitBlock.findTxWithSlot(slot);
                         if (!challengingTx) {
                             throw new Error("Invalid exit block: missing tx for slot " + slot.toString(10) + ".");
                         }
                         return [4 /*yield*/, this._dAppPlasmaClient.getPlasmaBlockAtAsync(prevBlockNum)];
-                    case 5:
+                    case 4:
                         prevBlock = _a.sent();
-                        return [4 /*yield*/, prevBlock.findTxWithSlot(slot)];
-                    case 6:
-                        prevTx = _a.sent();
+                        prevTx = prevBlock.findTxWithSlot(slot);
                         if (!prevTx) {
                             throw new Error("Invalid prev block: missing tx for slot " + slot.toString(10) + ".");
                         }
@@ -324,24 +296,23 @@ var Entity = /** @class */ (function () {
     };
     Entity.prototype.respondChallengeBeforeAsync = function (params) {
         return __awaiter(this, void 0, void 0, function () {
-            var slot, challengingBlockNum, challengingBlock, challengingTx;
+            var slot, challengingTxHash, respondingBlockNum, respondingBlock, respondingTx;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        slot = params.slot, challengingBlockNum = params.challengingBlockNum;
-                        return [4 /*yield*/, this._dAppPlasmaClient.getPlasmaBlockAtAsync(challengingBlockNum)];
+                        slot = params.slot, challengingTxHash = params.challengingTxHash, respondingBlockNum = params.respondingBlockNum;
+                        return [4 /*yield*/, this._dAppPlasmaClient.getPlasmaBlockAtAsync(respondingBlockNum)];
                     case 1:
-                        challengingBlock = _a.sent();
-                        return [4 /*yield*/, challengingBlock.findTxWithSlot(slot)];
-                    case 2:
-                        challengingTx = _a.sent();
-                        if (!challengingTx) {
-                            throw new Error("Invalid challenging block: missing tx for slot " + slot.toString(10) + ".");
+                        respondingBlock = _a.sent();
+                        respondingTx = respondingBlock.findTxWithSlot(slot);
+                        if (!respondingTx) {
+                            throw new Error("Invalid responding block: missing tx for slot " + slot.toString(10) + ".");
                         }
                         return [2 /*return*/, this._ethPlasmaClient.respondChallengeBeforeAsync({
                                 slot: slot,
-                                challengingBlockNum: challengingBlockNum,
-                                challengingTx: challengingTx,
+                                challengingTxHash: challengingTxHash,
+                                respondingBlockNum: respondingBlockNum,
+                                respondingTx: respondingTx,
                                 from: this.ethAddress,
                                 gas: this._defaultGas
                             })];
