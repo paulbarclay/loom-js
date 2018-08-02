@@ -13,6 +13,7 @@ export { unmarshalBigUIntPB, marshalBigUIntPB } from './big-uint'
 export { SignedTxMiddleware, NonceTxMiddleware } from './middleware'
 export { createDefaultTxMiddleware } from './helpers'
 export { LoomProvider } from './loom-provider'
+export { AddressMapper } from './address_mapper'
 
 import * as CryptoUtils from './crypto-utils'
 export { CryptoUtils }
@@ -27,7 +28,9 @@ export {
   IPlasmaCoin,
   PlasmaCoinState,
   IPlasmaDeposit,
-  marshalDepositEvent
+  marshalDepositEvent,
+  IPlasmaChallenge,
+  marshalChallengeEvent
 } from './plasma-cash/ethereum-client'
 export { PlasmaCashTx } from './plasma-cash/plasma-cash-tx'
 export { Web3Signer } from './plasma-cash/solidity-helpers'

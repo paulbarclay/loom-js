@@ -61,7 +61,7 @@ var PlasmaCashTx = /** @class */ (function () {
             this.newOwner
         ];
         console.log("This is screwed up");
-        return '0x'; //+ rlp.encode(data).toString('hex')
+        return '0x' + rlp.encode(data).toString('hex')
     };
     Object.defineProperty(PlasmaCashTx.prototype, "sig", {
         /**
