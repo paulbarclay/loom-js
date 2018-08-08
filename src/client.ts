@@ -221,6 +221,8 @@ export class Client extends EventEmitter {
     })
     this.accounts = new Map<string, Uint8Array>()
     this.caller = this.getNewCaller()
+
+    console.log("Constructed CLIENT")
   }
 
 

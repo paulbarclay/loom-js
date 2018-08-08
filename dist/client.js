@@ -160,6 +160,7 @@ var Client = /** @class */ (function (_super) {
         });
         _this.accounts = new Map();
         _this.caller = _this.getNewCaller();
+        console.log("Constructed CLIENT");
         return _this;
     }
     Object.defineProperty(Client.prototype, "readUrl", {
