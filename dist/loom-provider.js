@@ -537,6 +537,7 @@ var LoomProvider = /** @class */ (function () {
         var caller = new address_1.Address(this._client.chainId, address_1.LocalAddress.fromHexString(payload.from));
         var address = new address_1.Address(this._client.chainId, address_1.LocalAddress.fromHexString(payload.to));
         var data = Buffer.from(payload.data.substring(2), 'hex');
+        console.log("LP CALL: caller:" + caller + " address:" + address + " data:" + data);
         var callTx = new loom_pb_1.CallTx();
         callTx.setVmType(loom_pb_1.VMType.EVM);
         callTx.setInput(crypto_utils_1.bufferToProtobufBytes(data));
@@ -553,6 +554,7 @@ var LoomProvider = /** @class */ (function () {
         var caller = new address_1.Address(this._client.chainId, address_1.LocalAddress.fromHexString(payload.from));
         var address = new address_1.Address(this._client.chainId, address_1.LocalAddress.fromHexString(payload.to));
         var data = Buffer.from(payload.data.substring(2), 'hex');
+        console.log("LP static call: caller:" + caller + " address:" + address + " data:" + data);
         return this._client.queryAsync(address, data, loom_pb_1.VMType.EVM, caller);
     };
     LoomProvider.prototype._createBlockInfo = function (blockInfo, isFull) {
@@ -704,6 +706,7 @@ var LoomProvider = /** @class */ (function () {
         });
     };
     LoomProvider.prototype._onWebSocketMessage = function (msgEvent) {
+        console.log(JSON.stringify(msgEvent));
         if (msgEvent.data && msgEvent.id !== '0') {
             log("Socket message arrived " + JSON.stringify(msgEvent));
             this.notificationCallbacks.forEach(function (callback) {
