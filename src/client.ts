@@ -129,7 +129,6 @@ export class Client extends EventEmitter {
 
   private _writeClient: IJSONRPCClient
   private _readClient!: IJSONRPCClient
-  private nonceCallback: Function
 
   /** Middleware to apply to transactions before they are transmitted to the DAppChain. */
   txMiddleware: ITxMiddlewareHandler[] = []
@@ -162,7 +161,7 @@ export class Client extends EventEmitter {
    * @param readUrl Host & port of the DAppChain read/query interface, this should only be provided
    *                if it's not the same as `writeUrl`.
    */
-  constructor(chainId: string, writeUrl: string, readUrl?: string, nonceCallback?: Function)
+  constructor(chainId: string, writeUrl: string, readUrl?: string)
   /**
    * Constructs a new client to read & write data from/to a Loom DAppChain.
    * @param chainId DAppChain identifier.
@@ -170,12 +169,11 @@ export class Client extends EventEmitter {
    * @param readClient RPC client to use to query the DAppChain and listen to DAppChain events, this
    *                   should only be provided if it's not the same as `writeClient`.
    */
-  constructor(chainId: string, writeClient: IJSONRPCClient, readClient?: IJSONRPCClient, nonceCallback?: Function)
+  constructor(chainId: string, writeClient: IJSONRPCClient, readClient?: IJSONRPCClient)
   constructor(
     chainId: string,
     writeClient: IJSONRPCClient | string,
     readClient?: IJSONRPCClient | string,
-    nonceCallback?: Function,
   ) {
     super()
     this.chainId = chainId
@@ -221,7 +219,6 @@ export class Client extends EventEmitter {
         this._readClient.removeListener(RPCClientEvent.Message, emitContractEvent)
       }
     })
-    this.nonceCallback = nonceCallback ? nonceCallback : this.getNonceAsyncCallback;
     this.accounts = new Map<string, Uint8Array>()
     this.caller = this.getNewCaller()
   }
@@ -232,6 +229,7 @@ export class Client extends EventEmitter {
    * Once disconnected the client can no longer be used to interact with the DAppChain.
    */
   disconnect() {
+    console.log(`Loom Client Disconnect`)
     this.removeAllListeners()
     this._writeClient.disconnect()
     if (this._readClient && this._readClient != this._writeClient) {
@@ -256,6 +254,7 @@ export class Client extends EventEmitter {
     tx: T,
     opts: { middleware?: ITxMiddlewareHandler[] } = {}
   ): Promise<Uint8Array | void> {
+    console.log(`Loom Client commitTxAsync: ${JSON.stringify(tx)}`)
     const { middleware = this.txMiddleware } = opts
     const op = retry.operation(this.nonceRetryStrategy)
     return new Promise<Uint8Array | void>((resolve, reject) => {
@@ -325,6 +324,7 @@ export class Client extends EventEmitter {
     vmType: VMType = VMType.PLUGIN,
     caller?: Address
   ): Promise<Uint8Array | void> {
+    console.log(`Loom Client queryAsync: ${!!query ? query.toString() : "null"}`)
     const result = await this._readClient.sendAsync<string>('query', {
       contract: contract.local.toString(),
       query: query ? Uint8ArrayToB64(query) : undefined,
@@ -609,12 +609,6 @@ export class Client extends EventEmitter {
    */
   getNonceAsync(key: string): Promise<number> {
     return this._readClient.sendAsync<number>('nonce', { key })
-    //return this.nonceCallback(key);
-  }
-
-  getNonceAsyncCallback(key: string): Promise<number> {
-    const trimmed = key.replace('0x','')
-    return this._readClient.sendAsync<number>('nonce', { trimmed })
   }
 
   getPrivateKey(hex: string) {

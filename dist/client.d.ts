@@ -89,7 +89,6 @@ export declare class Client extends EventEmitter {
     readonly chainId: string;
     private _writeClient;
     private _readClient;
-    private nonceCallback;
     /** Middleware to apply to transactions before they are transmitted to the DAppChain. */
     txMiddleware: ITxMiddlewareHandler[];
     /**
@@ -108,7 +107,7 @@ export declare class Client extends EventEmitter {
      * @param readUrl Host & port of the DAppChain read/query interface, this should only be provided
      *                if it's not the same as `writeUrl`.
      */
-    constructor(chainId: string, writeUrl: string, readUrl?: string, nonceCallback?: Function);
+    constructor(chainId: string, writeUrl: string, readUrl?: string);
     /**
      * Constructs a new client to read & write data from/to a Loom DAppChain.
      * @param chainId DAppChain identifier.
@@ -116,7 +115,7 @@ export declare class Client extends EventEmitter {
      * @param readClient RPC client to use to query the DAppChain and listen to DAppChain events, this
      *                   should only be provided if it's not the same as `writeClient`.
      */
-    constructor(chainId: string, writeClient: IJSONRPCClient, readClient?: IJSONRPCClient, nonceCallback?: Function);
+    constructor(chainId: string, writeClient: IJSONRPCClient, readClient?: IJSONRPCClient);
     /**
      * Cleans up all underlying network resources.
      * Once disconnected the client can no longer be used to interact with the DAppChain.
@@ -273,7 +272,6 @@ export declare class Client extends EventEmitter {
      * @return The nonce.
      */
     getNonceAsync(key: string): Promise<number>;
-    getNonceAsyncCallback(key: string): Promise<number>;
     getPrivateKey(hex: string): Uint8Array;
     /**
      * Tries to resolve a contract name to an address.

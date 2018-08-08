@@ -101,7 +101,7 @@ exports.isInvalidTxNonceError = isInvalidTxNonceError;
  */
 var Client = /** @class */ (function (_super) {
     __extends(Client, _super);
-    function Client(chainId, writeClient, readClient, nonceCallback) {
+    function Client(chainId, writeClient, readClient) {
         var _this = _super.call(this) || this;
         /** Middleware to apply to transactions before they are transmitted to the DAppChain. */
         _this.txMiddleware = [];
@@ -158,7 +158,6 @@ var Client = /** @class */ (function (_super) {
                 _this._readClient.removeListener(json_rpc_client_1.RPCClientEvent.Message, emitContractEvent);
             }
         });
-        _this.nonceCallback = nonceCallback ? nonceCallback : _this.getNonceAsyncCallback;
         _this.accounts = new Map();
         _this.caller = _this.getNewCaller();
         return _this;
@@ -182,6 +181,7 @@ var Client = /** @class */ (function (_super) {
      * Once disconnected the client can no longer be used to interact with the DAppChain.
      */
     Client.prototype.disconnect = function () {
+        console.log("Loom Client Disconnect");
         this.removeAllListeners();
         this._writeClient.disconnect();
         if (this._readClient && this._readClient != this._writeClient) {
@@ -203,6 +203,7 @@ var Client = /** @class */ (function (_super) {
     Client.prototype.commitTxAsync = function (localAddress, tx, opts) {
         var _this = this;
         if (opts === void 0) { opts = {}; }
+        console.log("Loom Client commitTxAsync: " + JSON.stringify(tx));
         var _a = opts.middleware, middleware = _a === void 0 ? this.txMiddleware : _a;
         var op = retry_1.default.operation(this.nonceRetryStrategy);
         return new Promise(function (resolve, reject) {
@@ -281,12 +282,14 @@ var Client = /** @class */ (function (_super) {
             var result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this._readClient.sendAsync('query', {
-                            contract: contract.local.toString(),
-                            query: query ? crypto_utils_1.Uint8ArrayToB64(query) : undefined,
-                            vmType: vmType,
-                            caller: caller ? caller.toString() : undefined
-                        })];
+                    case 0:
+                        console.log("Loom Client queryAsync: " + (!!query ? query.toString() : "null"));
+                        return [4 /*yield*/, this._readClient.sendAsync('query', {
+                                contract: contract.local.toString(),
+                                query: query ? crypto_utils_1.Uint8ArrayToB64(query) : undefined,
+                                vmType: vmType,
+                                caller: caller ? caller.toString() : undefined
+                            })];
                     case 1:
                         result = _a.sent();
                         if (result) {
@@ -662,11 +665,6 @@ var Client = /** @class */ (function (_super) {
      */
     Client.prototype.getNonceAsync = function (key) {
         return this._readClient.sendAsync('nonce', { key: key });
-        //return this.nonceCallback(key);
-    };
-    Client.prototype.getNonceAsyncCallback = function (key) {
-        var trimmed = key.replace('0x', '');
-        return this._readClient.sendAsync('nonce', { trimmed: trimmed });
     };
     Client.prototype.getPrivateKey = function (hex) {
         return this.accounts.get(hex);
