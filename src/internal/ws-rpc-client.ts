@@ -83,6 +83,7 @@ export class WSRPCClient extends EventEmitter {
     )
 
     this.requestTimeout = requestTimeout
+    console.log(`WS-RPC-CLIENT: timeout:${requestTimeout}`)
 
     this.on('newListener', (event: string) => {
       if (event === RPCClientEvent.Message && this.listenerCount(event) === 0) {
@@ -158,6 +159,7 @@ export class WSRPCClient extends EventEmitter {
    */
   ensureConnectionAsync(): Promise<void> {
     if (this._client.ready) {
+      console.log(`WS-RPC: client is ready`)
       return Promise.resolve()
     }
     return new Promise((resolve, reject) => {
@@ -166,6 +168,7 @@ export class WSRPCClient extends EventEmitter {
         this.requestTimeout
       )
       this._client.once('open', () => {
+        console.log(`WS-RPC: client resolved connection`)
         clearTimeout(timeout)
         resolve()
       })

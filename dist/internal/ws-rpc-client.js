@@ -94,6 +94,7 @@ var WSRPCClient = /** @class */ (function (_super) {
             max_reconnects: maxReconnects
         }, generateRequestId);
         _this.requestTimeout = requestTimeout;
+        console.log("WS-RPC-CLIENT: timeout:" + requestTimeout);
         _this.on('newListener', function (event) {
             if (event === json_rpc_client_1.RPCClientEvent.Message && _this.listenerCount(event) === 0) {
                 // rpc-websockets is just going to throw away the event messages from the DAppChain because
@@ -172,11 +173,13 @@ var WSRPCClient = /** @class */ (function (_super) {
     WSRPCClient.prototype.ensureConnectionAsync = function () {
         var _this = this;
         if (this._client.ready) {
+            console.log("WS-RPC: client is ready");
             return Promise.resolve();
         }
         return new Promise(function (resolve, reject) {
             var timeout = setTimeout(function () { return reject(new Error('[WSRPCClient] Timeout while waiting for connection')); }, _this.requestTimeout);
             _this._client.once('open', function () {
+                console.log("WS-RPC: client resolved connection");
                 clearTimeout(timeout);
                 resolve();
             });
