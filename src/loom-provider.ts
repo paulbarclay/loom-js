@@ -103,6 +103,7 @@ export class LoomProvider {
    * @param privateKey Account private key
    */
   constructor(client: Client, privateKey: Uint8Array) {
+    console.log(`LP: PROVIDER CONSTRUCTOR: ${JSON.stringify(client)} key: ${privateKey} `)
     this._client = client
     this.notificationCallbacks = new Array()
     this.accounts = new Map<string, Uint8Array>()
@@ -127,6 +128,7 @@ export class LoomProvider {
     accountsPrivateKey.forEach(accountPrivateKey => {
       const publicKey = publicKeyFromPrivateKey(accountPrivateKey)
       const accountAddress = LocalAddress.fromPublicKey(publicKey).toString()
+      console.log(`LP ADD ACCOUNT: ${accountAddress}`)
       this.accountsAddrList.push(accountAddress)
       this.accounts.set(accountAddress, accountPrivateKey)
       this._client.addAccount(accountPrivateKey)

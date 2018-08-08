@@ -62,6 +62,7 @@ var LoomProvider = /** @class */ (function () {
      */
     function LoomProvider(client, privateKey) {
         var _this = this;
+        console.log("LP: PROVIDER CONSTRUCTOR: " + JSON.stringify(client) + " key: " + privateKey + " ");
         this._client = client;
         this.notificationCallbacks = new Array();
         this.accounts = new Map();
@@ -84,6 +85,7 @@ var LoomProvider = /** @class */ (function () {
         accountsPrivateKey.forEach(function (accountPrivateKey) {
             var publicKey = crypto_utils_1.publicKeyFromPrivateKey(accountPrivateKey);
             var accountAddress = address_1.LocalAddress.fromPublicKey(publicKey).toString();
+            console.log("LP ADD ACCOUNT: " + accountAddress);
             _this.accountsAddrList.push(accountAddress);
             _this.accounts.set(accountAddress, accountPrivateKey);
             _this._client.addAccount(accountPrivateKey);
