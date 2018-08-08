@@ -103,7 +103,7 @@ export class LoomProvider {
    * @param privateKey Account private key
    */
   constructor(client: Client, privateKey: Uint8Array) {
-    console.log(`LP: PROVIDER CONSTRUCTOR: ${JSON.stringify(client)} key: ${privateKey} `)
+    console.log(`LP: PROVIDER CONSTRUCTOR: ${client.readUrl} / ${client.writeUrl} key: ${privateKey} `)
     this._client = client
     this.notificationCallbacks = new Array()
     this.accounts = new Map<string, Uint8Array>()
