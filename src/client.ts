@@ -326,7 +326,7 @@ export class Client extends EventEmitter {
     vmType: VMType = VMType.PLUGIN,
     caller?: Address
   ): Promise<Uint8Array | void> {
-    console.log(`Loom Client queryAsync json: ${!!query ? JSON.stringify(query) : "null"}`)
+    console.log(`Loom Client queryAsync json: ${!!query ? JSON.stringify(query) : "null"} caller: ${caller}`)
     const result = await this._readClient.sendAsync<string>('query', {
       contract: contract.local.toString(),
       query: query ? Uint8ArrayToB64(query) : undefined,
