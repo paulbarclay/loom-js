@@ -284,7 +284,7 @@ var Client = /** @class */ (function (_super) {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        console.log("Loom Client queryAsync: " + (!!query ? query.toString() : "null"));
+                        console.log("Loom Client queryAsync: " + (!!query ? JSON.stringify(query) : "null"));
                         return [4 /*yield*/, this._readClient.sendAsync('query', {
                                 contract: contract.local.toString(),
                                 query: query ? crypto_utils_1.Uint8ArrayToB64(query) : undefined,
