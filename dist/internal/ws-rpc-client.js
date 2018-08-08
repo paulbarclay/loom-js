@@ -177,9 +177,14 @@ var WSRPCClient = /** @class */ (function (_super) {
             return Promise.resolve();
         }
         return new Promise(function (resolve, reject) {
-            console.log("WS-RPC: client is NOT ready");
-            var timeout = setTimeout(function () { return reject(new Error('[WSRPCClient] Timeout while waiting for connection')); }, _this.requestTimeout);
-            console.log("timeout: " + timeout);
+            var ms = new Date().getMilliseconds();
+            console.log("WS-RPC: client is NOT ready at " + ms);
+            var timeout = setTimeout(function () {
+                var newMs = new Date().getMilliseconds();
+                console.log("WS-RPC timeout has passed at " + newMs + ".");
+                reject(new Error('[WSRPCClient] Timeout while waiting for connection'));
+            }, _this.requestTimeout);
+            console.log("timeout length: " + timeout.ref.length + ". requestTimeout: " + _this.requestTimeout);
             _this._client.once('open', function () {
                 console.log("WS-RPC: client resolved connection");
                 clearTimeout(timeout);

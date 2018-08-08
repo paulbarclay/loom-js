@@ -163,12 +163,17 @@ export class WSRPCClient extends EventEmitter {
       return Promise.resolve()
     }
     return new Promise((resolve, reject) => {
-      console.log(`WS-RPC: client is NOT ready`)
+      const ms = new Date().getMilliseconds()
+      console.log(`WS-RPC: client is NOT ready at ${ms}`)
       const timeout = setTimeout(
-        () => reject(new Error('[WSRPCClient] Timeout while waiting for connection')),
+        () => {
+          const newMs = new Date().getMilliseconds()
+          console.log(`WS-RPC timeout has passed at ${newMs}.`)
+          reject(new Error('[WSRPCClient] Timeout while waiting for connection'))
+        },
         this.requestTimeout
       )
-      console.log(`timeout: ${timeout}`)
+      console.log(`timeout length: ${timeout.ref.length}. requestTimeout: ${this.requestTimeout}`)
       this._client.once('open', () => {
         console.log(`WS-RPC: client resolved connection`)
         clearTimeout(timeout)
