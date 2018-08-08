@@ -534,7 +534,7 @@ export class LoomProvider {
     const caller = new Address(this._client.chainId, LocalAddress.fromHexString(payload.from))
     const address = new Address(this._client.chainId, LocalAddress.fromHexString(payload.to))
     const data = Buffer.from(payload.data.substring(2), 'hex')
-    console.log(`LP static call: caller:${caller} address:${address} data:${data}`)
+    console.log(`LP static call: caller:${caller} address:${address} data:${payload.data}`)
     return this._client.queryAsync(address, data, VMType.EVM, caller)
   }
 

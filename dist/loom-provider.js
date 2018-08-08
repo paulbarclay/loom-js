@@ -556,7 +556,7 @@ var LoomProvider = /** @class */ (function () {
         var caller = new address_1.Address(this._client.chainId, address_1.LocalAddress.fromHexString(payload.from));
         var address = new address_1.Address(this._client.chainId, address_1.LocalAddress.fromHexString(payload.to));
         var data = Buffer.from(payload.data.substring(2), 'hex');
-        console.log("LP static call: caller:" + caller + " address:" + address + " data:" + data);
+        console.log("LP static call: caller:" + caller + " address:" + address + " data:" + payload.data);
         return this._client.queryAsync(address, data, loom_pb_1.VMType.EVM, caller);
     };
     LoomProvider.prototype._createBlockInfo = function (blockInfo, isFull) {
