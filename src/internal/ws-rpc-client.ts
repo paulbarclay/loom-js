@@ -180,6 +180,7 @@ export class WSRPCClient extends EventEmitter {
    *          JSON-RPC response message.
    */
   async sendAsync<T>(method: string, params: object | any[]): Promise<T> {
+    console.log(`Sending RPC msg to ${this.url}, method ${method}`)
     await this.ensureConnectionAsync()
     log(`Sending RPC msg to ${this.url}, method ${method}`)
     return this._client.call<T>(method, params, this.requestTimeout)
