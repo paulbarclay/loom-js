@@ -212,6 +212,7 @@ var Client = /** @class */ (function (_super) {
                 _this._commitTxAsync(localAddress, tx, middleware)
                     .then(resolve)
                     .catch(function (err) {
+                    console.log("Loom Client commit tx error");
                     if (err instanceof Error && err.message === INVALID_TX_NONCE_ERROR) {
                         if (!op.retry(err)) {
                             reject(err);
@@ -246,21 +247,27 @@ var Client = /** @class */ (function (_super) {
                     case 4: return [4 /*yield*/, this._writeClient.sendAsync('broadcast_tx_commit', [crypto_utils_1.Uint8ArrayToB64(txBytes)])];
                     case 5:
                         result = _a.sent();
+                        console.log("Loom Client. Result gained: " + JSON.stringify(result));
                         if (result) {
                             if ((result.check_tx.code || 0) != 0) {
                                 if (!result.check_tx.log) {
+                                    console.log("Loom Client. Failed to commit Tx. no log: " + result.check_tx.code);
                                     throw new Error("Failed to commit Tx: " + result.check_tx.code);
                                 }
                                 if (result.check_tx.code === 1 &&
                                     result.check_tx.log === 'sequence number does not match') {
+                                    console.log("Loom Client. Invalid Nonce Error: " + result.check_tx.log);
                                     throw new Error(INVALID_TX_NONCE_ERROR);
                                 }
+                                console.log("Loom Client. Failed to commit Tx: " + result.check_tx.log);
                                 throw new Error("Failed to commit Tx: " + result.check_tx.log);
                             }
                             if ((result.deliver_tx.code || 0) != 0) {
                                 if (!result.deliver_tx.log) {
+                                    console.log("Loom Client. Failed to commit Tx (deliver): " + result.deliver_tx.code);
                                     throw new Error("Failed to commit Tx: " + result.deliver_tx.code);
                                 }
+                                console.log("Loom Client. Failed to commit Tx (deliver): " + result.deliver_tx.log);
                                 throw new Error("Failed to commit Tx: " + result.deliver_tx.log);
                             }
                         }
