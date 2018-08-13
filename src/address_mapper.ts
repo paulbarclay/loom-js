@@ -1,61 +1,31 @@
 import { Client } from './client'
 import { Contract } from './contract'
-import { Address, LocalAddress } from './address'
-import { publicKeyFromPrivateKey } from './crypto-utils'
+import { Address } from './address'
 import {
-  AddressMapperAddContractMappingRequest,
   AddressMapperAddIdentityMappingRequest,
   AddressMapperGetMappingRequest,
   AddressMapperGetMappingResponse
-} from './proto/loom_pb'
+} from './proto/address_mapper_pb'
 import { Web3Signer, soliditySha3 } from './plasma-cash/solidity-helpers'
 
-export class AddressMapper {
-  private _addressMapperContract!: Contract
+export interface IAddressMapping {
+  from: Address
+  to: Address
+}
 
+export class AddressMapper extends Contract {
   static async createAsync(client: Client, callerAddr: Address): Promise<AddressMapper> {
     const contractAddr = await client.getContractAddressAsync('addressmapper')
     if (!contractAddr) {
       throw Error('Failed to resolve contract address')
     }
 
-    const contract = new Contract({
-      contractAddr,
-      client
-    })
-
-    return new AddressMapper(contract)
+    return new AddressMapper({ contractAddr, callerAddr, client })
   }
 
-  constructor(contract: Contract) {
-    this._addressMapperContract = contract
+  constructor(params: { contractAddr: Address; callerAddr: Address; client: Client }) {
+    super(params)
   }
-
-  async addContractMappingAsync(from: Address, to: Address): Promise<void> {
-    const mappingContractRequest = new AddressMapperAddContractMappingRequest()
-    mappingContractRequest.setFrom(from.MarshalPB())
-    mappingContractRequest.setTo(to.MarshalPB())
-    return this._addressMapperContract.callAsync<void>(
-      from,
-      'AddContractMapping',
-      mappingContractRequest
-    )
-  }
-
-  async getContractMappingAsync(from: Address): Promise<{ from: Address; to: Address }> {
-    const getMappingRequest = new AddressMapperGetMappingRequest()
-    getMappingRequest.setFrom(from.MarshalPB())
-
-    const result = await this._addressMapperContract.staticCallAsync(
-      from,
-      'GetMapping',
-      getMappingRequest,
-      new AddressMapperGetMappingResponse()
-    )
-
-    return { from: Address.UmarshalPB(result.getFrom()!), to: Address.UmarshalPB(result.getTo()!) }
-  }
-
   async addIdentityMappingAsync(
     from: Address,
     to: Address,
@@ -76,10 +46,23 @@ export class AddressMapper {
     const sign = await web3Signer.signAsync(hash)
     mappingIdentityRequest.setSignature(sign)
 
-    return this._addressMapperContract.callAsync<void>(
+    return this.callAsync<void>(from, 'AddIdentityMapping', mappingIdentityRequest)
+  }
+
+  async getMappingAsync(from: Address): Promise<IAddressMapping> {
+    const getMappingRequest = new AddressMapperGetMappingRequest()
+    getMappingRequest.setFrom(from.MarshalPB())
+
+    const result = await this.staticCallAsync(
       from,
-      'AddIdentityMapping',
-      mappingIdentityRequest
+      'GetMapping',
+      getMappingRequest,
+      new AddressMapperGetMappingResponse()
     )
+
+    return {
+      from: Address.UmarshalPB(result.getFrom()!),
+      to: Address.UmarshalPB(result.getTo()!)
+    } as IAddressMapping
   }
 }
