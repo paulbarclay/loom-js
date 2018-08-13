@@ -34,9 +34,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+var debug_1 = __importDefault(require("debug"));
 var loom_pb_1 = require("../proto/loom_pb");
 var crypto_utils_1 = require("../crypto-utils");
+var log = debug_1.default('nonce-tx-middleware');
 /**
  * Wraps data in a NonceTx.
  * The Loom DAppChain keeps track of the nonce of the last committed tx to prevent replay attacks.
@@ -57,6 +62,7 @@ var NonceTxMiddleware = /** @class */ (function () {
                         return [4 /*yield*/, this._client.getNonceAsync(key)];
                     case 1:
                         nonce = _a.sent();
+                        log("Next nonce " + (nonce + 1));
                         tx = new loom_pb_1.NonceTx();
                         tx.setInner(txData);
                         tx.setSequence(nonce + 1);

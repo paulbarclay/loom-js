@@ -2,7 +2,8 @@
 import { Message } from 'google-protobuf';
 import EventEmitter from 'events';
 import retry from 'retry';
-import { VMType, EvmTxReceipt, EvmTxObject, EthBlockInfo, EthBlockHashList, EthFilterLogList, EthTxHashList } from './proto/loom_pb';
+import { VMType } from './proto/loom_pb';
+import { EvmTxReceipt, EvmTxObject, EthBlockInfo, EthBlockHashList, EthFilterLogList, EthTxHashList } from './proto/evm_pb';
 import { Address } from './address';
 import { IJSONRPCClient } from './internal/json-rpc-client';
 /**

@@ -52,6 +52,7 @@ var debug_1 = __importDefault(require("debug"));
 var events_1 = __importDefault(require("events"));
 var retry_1 = __importDefault(require("retry"));
 var loom_pb_1 = require("./proto/loom_pb");
+var evm_pb_1 = require("./proto/evm_pb");
 var crypto_utils_1 = require("./crypto-utils");
 var address_1 = require("./address");
 var ws_rpc_client_1 = require("./internal/ws-rpc-client");
@@ -325,7 +326,7 @@ var Client = /** @class */ (function (_super) {
                     case 1:
                         result = _a.sent();
                         if (result) {
-                            return [2 /*return*/, loom_pb_1.EvmTxReceipt.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(crypto_utils_1.B64ToUint8Array(result)))];
+                            return [2 /*return*/, evm_pb_1.EvmTxReceipt.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(crypto_utils_1.B64ToUint8Array(result)))];
                         }
                         else {
                             return [2 /*return*/, null];
@@ -352,7 +353,7 @@ var Client = /** @class */ (function (_super) {
                     case 1:
                         result = _a.sent();
                         if (result) {
-                            return [2 /*return*/, loom_pb_1.EvmTxObject.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(crypto_utils_1.B64ToUint8Array(result)))];
+                            return [2 /*return*/, evm_pb_1.EvmTxObject.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(crypto_utils_1.B64ToUint8Array(result)))];
                         }
                         else {
                             return [2 /*return*/, null];
@@ -474,15 +475,15 @@ var Client = /** @class */ (function (_super) {
                     case 1:
                         result = _a.sent();
                         if (result) {
-                            envelope = loom_pb_1.EthFilterEnvelope.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(result));
+                            envelope = evm_pb_1.EthFilterEnvelope.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(result));
                             switch (envelope.getMessageCase()) {
-                                case loom_pb_1.EthFilterEnvelope.MessageCase.ETH_BLOCK_HASH_LIST:
+                                case evm_pb_1.EthFilterEnvelope.MessageCase.ETH_BLOCK_HASH_LIST:
                                     return [2 /*return*/, envelope.getEthBlockHashList()];
-                                case loom_pb_1.EthFilterEnvelope.MessageCase.ETH_FILTER_LOG_LIST:
+                                case evm_pb_1.EthFilterEnvelope.MessageCase.ETH_FILTER_LOG_LIST:
                                     return [2 /*return*/, envelope.getEthFilterLogList()];
-                                case loom_pb_1.EthFilterEnvelope.MessageCase.ETH_TX_HASH_LIST:
+                                case evm_pb_1.EthFilterEnvelope.MessageCase.ETH_TX_HASH_LIST:
                                     return [2 /*return*/, envelope.getEthTxHashList()];
-                                case loom_pb_1.EthFilterEnvelope.MessageCase.MESSAGE_NOT_SET:
+                                case evm_pb_1.EthFilterEnvelope.MessageCase.MESSAGE_NOT_SET:
                                 default:
                                     return [2 /*return*/, null];
                             }
@@ -579,7 +580,7 @@ var Client = /** @class */ (function (_super) {
                     case 1:
                         result = _a.sent();
                         if (result) {
-                            return [2 /*return*/, loom_pb_1.EthBlockInfo.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(crypto_utils_1.B64ToUint8Array(result)))];
+                            return [2 /*return*/, evm_pb_1.EthBlockInfo.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(crypto_utils_1.B64ToUint8Array(result)))];
                         }
                         else {
                             return [2 /*return*/, null];
@@ -608,7 +609,7 @@ var Client = /** @class */ (function (_super) {
                     case 1:
                         result = _a.sent();
                         if (result) {
-                            return [2 /*return*/, loom_pb_1.EthBlockInfo.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(crypto_utils_1.B64ToUint8Array(result)))];
+                            return [2 /*return*/, evm_pb_1.EthBlockInfo.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(crypto_utils_1.B64ToUint8Array(result)))];
                         }
                         else {
                             return [2 /*return*/, null];
@@ -672,7 +673,17 @@ var Client = /** @class */ (function (_super) {
      * @return The nonce.
      */
     Client.prototype.getNonceAsync = function (key) {
-        return this._readClient.sendAsync('nonce', { key: key });
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = parseInt;
+                        return [4 /*yield*/, this._readClient.sendAsync('nonce', { key: key })];
+                    case 1: return [2 /*return*/, _a.apply(void 0, [_b.sent(), 10])];
+                }
+            });
+        });
     };
     Client.prototype.getPrivateKey = function (hex) {
         return this.accounts.get(hex);
@@ -719,7 +730,7 @@ var Client = /** @class */ (function (_super) {
                 data: crypto_utils_1.B64ToUint8Array(result.encoded_body || '0x0'),
                 topics: result.topics,
                 transactionHash: result.tx_hash,
-                transactionHashBytes: crypto_utils_1.B64ToUint8Array(result.tx_hash)
+                transactionHashBytes: result.tx_hash ? crypto_utils_1.B64ToUint8Array(result.tx_hash) : new Uint8Array([])
             };
             this.emit(ClientEvent.Contract, eventArgs);
         }

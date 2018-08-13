@@ -42,6 +42,7 @@ var debug_1 = __importDefault(require("debug"));
 var client_1 = require("./client");
 var helpers_1 = require("./helpers");
 var loom_pb_1 = require("./proto/loom_pb");
+var evm_pb_1 = require("./proto/evm_pb");
 var address_1 = require("./address");
 var crypto_utils_1 = require("./crypto-utils");
 var _1 = require(".");
@@ -366,17 +367,17 @@ var LoomProvider = /** @class */ (function () {
                         if (!result) {
                             return [2 /*return*/, []];
                         }
-                        if (result instanceof loom_pb_1.EthBlockHashList) {
+                        if (result instanceof evm_pb_1.EthBlockHashList) {
                             return [2 /*return*/, result
                                     .getEthBlockHashList_asU8()
                                     .map(function (hash) { return crypto_utils_1.bytesToHexAddrLC(hash); })];
                         }
-                        else if (result instanceof loom_pb_1.EthTxHashList) {
+                        else if (result instanceof evm_pb_1.EthTxHashList) {
                             return [2 /*return*/, result
                                     .getEthTxHashList_asU8()
                                     .map(function (hash) { return crypto_utils_1.bytesToHexAddrLC(hash); })];
                         }
-                        else if (result instanceof loom_pb_1.EthFilterLogList) {
+                        else if (result instanceof evm_pb_1.EthFilterLogList) {
                             return [2 /*return*/, result
                                     .getEthBlockLogsList()
                                     .map(function (log) { return _this._createLogResult(log); })];
@@ -568,7 +569,7 @@ var LoomProvider = /** @class */ (function () {
         var timestamp = blockInfo.getTimestamp();
         var transactions = blockInfo.getTransactionsList_asU8().map(function (transaction) {
             if (isFull) {
-                return _this._createReceiptResult(loom_pb_1.EvmTxReceipt.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(transaction)));
+                return _this._createReceiptResult(evm_pb_1.EvmTxReceipt.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(transaction)));
             }
             else {
                 return crypto_utils_1.bytesToHexAddrLC(transaction);
@@ -699,7 +700,7 @@ var LoomProvider = /** @class */ (function () {
                         if (!logsListAsyncResult) {
                             return [2 /*return*/, []];
                         }
-                        logList = loom_pb_1.EthFilterLogList.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(logsListAsyncResult));
+                        logList = evm_pb_1.EthFilterLogList.deserializeBinary(crypto_utils_1.bufferToProtobufBytes(logsListAsyncResult));
                         return [2 /*return*/, logList.getEthBlockLogsList().map(function (log) {
                                 return _this._createLogResult(log);
                             })];

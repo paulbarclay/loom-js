@@ -60,14 +60,14 @@ const callTransactionAsync = async (
   tx.setId(2)
   tx.setData(msgTx.serializeBinary())
 
-  await client.commitTxAsync<Transaction>(tx)
+  await client.commitTxAsync<Transaction>(from.local.toString(), tx)
 }
 
 test('Client EVM Event test', async t => {
   try {
     const privateKey = CryptoUtils.generatePrivateKey()
     const publicKey = CryptoUtils.publicKeyFromPrivateKey(privateKey)
-    const client = createTestClient()
+    const client = createTestClient(privateKey)
 
     // Only used for deploy the contract
     const loomProvider = new LoomProvider(client, privateKey)
@@ -81,8 +81,8 @@ test('Client EVM Event test', async t => {
 
     // Middleware used for client
     client.txMiddleware = [
-      new NonceTxMiddleware(publicKey, client),
-      new SignedTxMiddleware(privateKey)
+      new NonceTxMiddleware(client),
+      new SignedTxMiddleware(client)
     ]
 
     // Filter by topics

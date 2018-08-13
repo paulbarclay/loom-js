@@ -34,7 +34,7 @@ var LocalAddress = /** @class */ (function () {
             throw new Error('hexAddr argument has no 0x prefix');
         }
         var bytes = Buffer.from(hexAddr.slice(2), 'hex');
-        if (bytes.length != 20) {
+        if (bytes.length !== 20) {
             throw new Error("Invalid local address, expected 20 bytes, got " + bytes.length);
         }
         return new LocalAddress(bytes);
@@ -84,7 +84,7 @@ var Address = /** @class */ (function () {
      */
     Address.fromString = function (address) {
         var parts = address.split(':');
-        if (parts.length != 2) {
+        if (parts.length !== 2) {
             throw new Error('Invalid address string');
         }
         return new Address(parts[0], LocalAddress.fromHexString(parts[1]));

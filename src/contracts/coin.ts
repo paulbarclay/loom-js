@@ -29,9 +29,10 @@ export class Coin extends Contract {
     super(params)
   }
 
-  async getTotalSupplyAsync(): Promise<BN> {
+  async getTotalSupplyAsync(caller: Address): Promise<BN> {
     const totalSupplyReq = new TotalSupplyRequest()
     const result = await this.staticCallAsync(
+      caller,
       'TotalSupply',
       totalSupplyReq,
       new TotalSupplyResponse()
@@ -39,40 +40,40 @@ export class Coin extends Contract {
     return unmarshalBigUIntPB(result.getTotalSupply()!)
   }
 
-  async getBalanceOfAsync(owner: Address): Promise<BN> {
+  async getBalanceOfAsync(caller: Address, owner: Address): Promise<BN> {
     const balanceOfReq = new BalanceOfRequest()
     balanceOfReq.setOwner(owner.MarshalPB())
-    const result = await this.staticCallAsync('BalanceOf', balanceOfReq, new BalanceOfResponse())
+    const result = await this.staticCallAsync(caller, 'BalanceOf', balanceOfReq, new BalanceOfResponse())
     return unmarshalBigUIntPB(result.getBalance()!)
   }
 
-  async getAllowanceAsync(owner: Address, spender: Address): Promise<BN> {
+  async getAllowanceAsync(caller: Address, owner: Address, spender: Address): Promise<BN> {
     const allowanceReq = new AllowanceRequest()
     allowanceReq.setOwner(owner.MarshalPB())
     allowanceReq.setSpender(spender.MarshalPB())
-    const result = await this.staticCallAsync('Allowance', allowanceReq, new AllowanceResponse())
+    const result = await this.staticCallAsync(caller, 'Allowance', allowanceReq, new AllowanceResponse())
     return unmarshalBigUIntPB(result.getAmount()!)
   }
 
-  approveAsync(spender: Address, amount: BN) {
+  approveAsync(caller: Address, spender: Address, amount: BN) {
     const approveReq = new ApproveRequest()
     approveReq.setSpender(spender.MarshalPB())
     approveReq.setAmount(marshalBigUIntPB(amount))
-    return this.callAsync<void>('Approve', approveReq)
+    return this.callAsync<void>(caller, 'Approve', approveReq)
   }
 
-  transferAsync(to: Address, amount: BN) {
+  transferAsync(caller: Address, to: Address, amount: BN) {
     const transferReq = new TransferRequest()
     transferReq.setTo(to.MarshalPB())
     transferReq.setAmount(marshalBigUIntPB(amount))
-    return this.callAsync<void>('Transfer', transferReq)
+    return this.callAsync<void>(caller, 'Transfer', transferReq)
   }
 
-  transferFromAsync(from: Address, to: Address, amount: BN) {
+  transferFromAsync(caller: Address, from: Address, to: Address, amount: BN) {
     const transferFromReq = new TransferFromRequest()
     transferFromReq.setFrom(from.MarshalPB())
     transferFromReq.setTo(to.MarshalPB())
     transferFromReq.setAmount(marshalBigUIntPB(amount))
-    return this.callAsync<void>('TransferFrom', transferFromReq)
+    return this.callAsync<void>(caller, 'TransferFrom', transferFromReq)
   }
 }

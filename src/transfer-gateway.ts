@@ -99,12 +99,14 @@ export class TransferGateway extends Contract {
   }
 
   addContractMappingAsync(params: {
+    caller: Address
     foreignContract: Address
     localContract: Address
     foreignContractCreatorSig: Uint8Array
     foreignContractCreatorTxHash: Uint8Array
   }): Promise<void> {
     const {
+      caller,
       foreignContract,
       localContract,
       foreignContractCreatorSig,
@@ -117,15 +119,15 @@ export class TransferGateway extends Contract {
     mappingContractRequest.setForeignContractCreatorSig(foreignContractCreatorSig)
     mappingContractRequest.setForeignContractTxHash(foreignContractCreatorTxHash)
 
-    return this.callAsync<void>('AddContractMapping', mappingContractRequest)
+    return this.callAsync<void>(caller, 'AddContractMapping', mappingContractRequest)
   }
 
-  withdrawERC721Async(tokenId: BN, tokenContract: Address): Promise<void> {
+  withdrawERC721Async(caller: Address, tokenId: BN, tokenContract: Address): Promise<void> {
     const tgWithdrawERC721Req = new TransferGatewayWithdrawERC721Request()
     tgWithdrawERC721Req.setTokenId(marshalBigUIntPB(tokenId))
     tgWithdrawERC721Req.setTokenContract(tokenContract.MarshalPB())
 
-    return this.callAsync<void>('WithdrawERC721', tgWithdrawERC721Req)
+    return this.callAsync<void>(caller, 'WithdrawERC721', tgWithdrawERC721Req)
   }
 
   async withdrawalReceiptAsync(owner: Address): Promise<IWithdrawalReceipt | null> {
@@ -133,6 +135,7 @@ export class TransferGateway extends Contract {
     tgWithdrawReceiptReq.setOwner(owner.MarshalPB())
 
     const result = await this.staticCallAsync(
+      owner,
       'WithdrawalReceipt',
       tgWithdrawReceiptReq,
       new TransferGatewayWithdrawalReceiptResponse()

@@ -126,7 +126,9 @@ var WSRPCClient = /** @class */ (function (_super) {
                         _this._isSubcribed = false;
                         _this.emit(json_rpc_client_1.RPCClientEvent.Subscribed, _this.url, false);
                     })
-                        .catch(function (err) { return _this.emit(json_rpc_client_1.RPCClientEvent.Error, _this.url, err); });
+                        .catch(function (err) {
+                        _this.emit(json_rpc_client_1.RPCClientEvent.Error, _this.url, err);
+                    });
                 }
             }
         });

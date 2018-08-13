@@ -66,31 +66,6 @@ function getClientAndContract(createClient) {
         });
     });
 }
-function testAddMapping(t, createClient) {
-    return __awaiter(this, void 0, void 0, function () {
-        var _a, client, addressMapper, pubKey, ethAddress, from, to, result;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0: return [4 /*yield*/, getClientAndContract(createClient)];
-                case 1:
-                    _a = _b.sent(), client = _a.client, addressMapper = _a.addressMapper, pubKey = _a.pubKey;
-                    ethAddress = '0xEf90a80506682b2bb7680166694a2d37d9cBf44a';
-                    from = new index_1.Address('eth', index_1.LocalAddress.fromHexString(ethAddress));
-                    to = new index_1.Address(client.chainId, index_1.LocalAddress.fromPublicKey(pubKey));
-                    return [4 /*yield*/, addressMapper.addContractMappingAsync(from, to)];
-                case 2:
-                    _b.sent();
-                    return [4 /*yield*/, addressMapper.getContractMappingAsync(from)];
-                case 3:
-                    result = _b.sent();
-                    t.assert(from.equals(result.from), 'Mapping "from" correctly returned');
-                    t.assert(to.equals(result.to), 'Mapping "to" correctly returned');
-                    client.disconnect();
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
 function testAddIdentity(t, createClient) {
     return __awaiter(this, void 0, void 0, function () {
         var _a, client, addressMapper, pubKey, ethAddress, from, to, web3, web3Signer, result;
@@ -107,7 +82,7 @@ function testAddIdentity(t, createClient) {
                     return [4 /*yield*/, addressMapper.addIdentityMappingAsync(from, to, web3Signer)];
                 case 2:
                     _b.sent();
-                    return [4 /*yield*/, addressMapper.getContractMappingAsync(from)];
+                    return [4 /*yield*/, addressMapper.getMappingAsync(from)];
                 case 3:
                     result = _b.sent();
                     t.assert(from.equals(result.from), 'Identity "from" correctly returned');
@@ -118,25 +93,21 @@ function testAddIdentity(t, createClient) {
         });
     });
 }
-tape_1.default('Contract', function (t) { return __awaiter(_this, void 0, void 0, function () {
+tape_1.default('Address Mapper', function (t) { return __awaiter(_this, void 0, void 0, function () {
     var err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 3, , 4]);
-                t.comment('Calls via HTTP');
-                return [4 /*yield*/, testAddMapping(t, helpers_1.createTestHttpClient)];
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, testAddIdentity(t, helpers_1.createTestHttpClient)];
             case 1:
                 _a.sent();
-                return [4 /*yield*/, testAddIdentity(t, helpers_1.createTestHttpClient)];
+                return [3 /*break*/, 3];
             case 2:
-                _a.sent();
-                return [3 /*break*/, 4];
-            case 3:
                 err_1 = _a.sent();
                 t.fail(err_1);
-                return [3 /*break*/, 4];
-            case 4:
+                return [3 /*break*/, 3];
+            case 3:
                 t.end();
                 return [2 /*return*/];
         }

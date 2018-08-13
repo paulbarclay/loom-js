@@ -45,73 +45,98 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var contract_1 = require("./contract");
-var address_1 = require("./address");
-var address_mapper_pb_1 = require("./proto/address_mapper_pb");
-var solidity_helpers_1 = require("./plasma-cash/solidity-helpers");
-var AddressMapper = /** @class */ (function (_super) {
-    __extends(AddressMapper, _super);
-    function AddressMapper(params) {
+var contract_1 = require("../contract");
+var coin_pb_1 = require("../proto/coin_pb");
+var big_uint_1 = require("../big-uint");
+var Coin = /** @class */ (function (_super) {
+    __extends(Coin, _super);
+    function Coin(params) {
         return _super.call(this, params) || this;
     }
-    AddressMapper.createAsync = function (client, callerAddr) {
+    Coin.createAsync = function (client, callerAddr) {
         return __awaiter(this, void 0, void 0, function () {
             var contractAddr;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, client.getContractAddressAsync('addressmapper')];
+                    case 0: return [4 /*yield*/, client.getContractAddressAsync('coin')];
                     case 1:
                         contractAddr = _a.sent();
                         if (!contractAddr) {
                             throw Error('Failed to resolve contract address');
                         }
-                        return [2 /*return*/, new AddressMapper({ contractAddr: contractAddr, callerAddr: callerAddr, client: client })];
+                        return [2 /*return*/, new Coin({ contractAddr: contractAddr, callerAddr: callerAddr, client: client })];
                 }
             });
         });
     };
-    AddressMapper.prototype.addIdentityMappingAsync = function (from, to, web3Signer) {
+    Coin.prototype.getTotalSupplyAsync = function (caller) {
         return __awaiter(this, void 0, void 0, function () {
-            var mappingIdentityRequest, hash, sign;
+            var totalSupplyReq, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        mappingIdentityRequest = new address_mapper_pb_1.AddressMapperAddIdentityMappingRequest();
-                        mappingIdentityRequest.setFrom(from.MarshalPB());
-                        mappingIdentityRequest.setTo(to.MarshalPB());
-                        hash = solidity_helpers_1.soliditySha3({
-                            type: 'address',
-                            value: from.local.toString().slice(2)
-                        }, { type: 'address', value: to.local.toString().slice(2) });
-                        return [4 /*yield*/, web3Signer.signAsync(hash)];
-                    case 1:
-                        sign = _a.sent();
-                        mappingIdentityRequest.setSignature(sign);
-                        return [2 /*return*/, this.callAsync(from, 'AddIdentityMapping', mappingIdentityRequest)];
-                }
-            });
-        });
-    };
-    AddressMapper.prototype.getMappingAsync = function (from) {
-        return __awaiter(this, void 0, void 0, function () {
-            var getMappingRequest, result;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        getMappingRequest = new address_mapper_pb_1.AddressMapperGetMappingRequest();
-                        getMappingRequest.setFrom(from.MarshalPB());
-                        return [4 /*yield*/, this.staticCallAsync(from, 'GetMapping', getMappingRequest, new address_mapper_pb_1.AddressMapperGetMappingResponse())];
+                        totalSupplyReq = new coin_pb_1.TotalSupplyRequest();
+                        return [4 /*yield*/, this.staticCallAsync(caller, 'TotalSupply', totalSupplyReq, new coin_pb_1.TotalSupplyResponse())];
                     case 1:
                         result = _a.sent();
-                        return [2 /*return*/, {
-                                from: address_1.Address.UmarshalPB(result.getFrom()),
-                                to: address_1.Address.UmarshalPB(result.getTo())
-                            }];
+                        return [2 /*return*/, big_uint_1.unmarshalBigUIntPB(result.getTotalSupply())];
                 }
             });
         });
     };
-    return AddressMapper;
+    Coin.prototype.getBalanceOfAsync = function (caller, owner) {
+        return __awaiter(this, void 0, void 0, function () {
+            var balanceOfReq, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        balanceOfReq = new coin_pb_1.BalanceOfRequest();
+                        balanceOfReq.setOwner(owner.MarshalPB());
+                        return [4 /*yield*/, this.staticCallAsync(caller, 'BalanceOf', balanceOfReq, new coin_pb_1.BalanceOfResponse())];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, big_uint_1.unmarshalBigUIntPB(result.getBalance())];
+                }
+            });
+        });
+    };
+    Coin.prototype.getAllowanceAsync = function (caller, owner, spender) {
+        return __awaiter(this, void 0, void 0, function () {
+            var allowanceReq, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        allowanceReq = new coin_pb_1.AllowanceRequest();
+                        allowanceReq.setOwner(owner.MarshalPB());
+                        allowanceReq.setSpender(spender.MarshalPB());
+                        return [4 /*yield*/, this.staticCallAsync(caller, 'Allowance', allowanceReq, new coin_pb_1.AllowanceResponse())];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, big_uint_1.unmarshalBigUIntPB(result.getAmount())];
+                }
+            });
+        });
+    };
+    Coin.prototype.approveAsync = function (caller, spender, amount) {
+        var approveReq = new coin_pb_1.ApproveRequest();
+        approveReq.setSpender(spender.MarshalPB());
+        approveReq.setAmount(big_uint_1.marshalBigUIntPB(amount));
+        return this.callAsync(caller, 'Approve', approveReq);
+    };
+    Coin.prototype.transferAsync = function (caller, to, amount) {
+        var transferReq = new coin_pb_1.TransferRequest();
+        transferReq.setTo(to.MarshalPB());
+        transferReq.setAmount(big_uint_1.marshalBigUIntPB(amount));
+        return this.callAsync(caller, 'Transfer', transferReq);
+    };
+    Coin.prototype.transferFromAsync = function (caller, from, to, amount) {
+        var transferFromReq = new coin_pb_1.TransferFromRequest();
+        transferFromReq.setFrom(from.MarshalPB());
+        transferFromReq.setTo(to.MarshalPB());
+        transferFromReq.setAmount(big_uint_1.marshalBigUIntPB(amount));
+        return this.callAsync(caller, 'TransferFrom', transferFromReq);
+    };
+    return Coin;
 }(contract_1.Contract));
-exports.AddressMapper = AddressMapper;
-//# sourceMappingURL=address_mapper.js.map
+exports.Coin = Coin;
+//# sourceMappingURL=coin.js.map

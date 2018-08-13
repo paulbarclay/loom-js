@@ -256,7 +256,7 @@ export class Client extends EventEmitter {
     tx: T,
     opts: { middleware?: ITxMiddlewareHandler[] } = {}
   ): Promise<Uint8Array | void> {
-    console.log(`Loom Client commitTxAsync: ${JSON.stringify(tx)}`)
+    // console.log(`Loom Client commitTxAsync: ${JSON.stringify(tx)}`)
     const { middleware = this.txMiddleware } = opts
     const op = retry.operation(this.nonceRetryStrategy)
     return new Promise<Uint8Array | void>((resolve, reject) => {
