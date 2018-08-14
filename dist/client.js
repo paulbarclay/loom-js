@@ -205,7 +205,7 @@ var Client = /** @class */ (function (_super) {
     Client.prototype.commitTxAsync = function (localAddress, tx, opts) {
         var _this = this;
         if (opts === void 0) { opts = {}; }
-        console.log("Loom Client commitTxAsync: " + JSON.stringify(tx));
+        // console.log(`Loom Client commitTxAsync: ${JSON.stringify(tx)}`)
         var _a = opts.middleware, middleware = _a === void 0 ? this.txMiddleware : _a;
         var op = retry_1.default.operation(this.nonceRetryStrategy);
         return new Promise(function (resolve, reject) {
