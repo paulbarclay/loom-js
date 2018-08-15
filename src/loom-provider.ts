@@ -297,7 +297,7 @@ export class LoomProvider {
 
     try {
       const f = functionToExecute(payload.method).bind(this)
-      console.log(`LP: payload.method`)
+      console.log(`LP: ${payload.method}`)
       const result = await f(payload)
       callback(null, this._okResponse(payload.id, result, isArray))
     } catch (err) {

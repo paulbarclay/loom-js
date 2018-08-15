@@ -243,7 +243,7 @@ var LoomProvider = /** @class */ (function () {
                     case 1:
                         _a.trys.push([1, 3, , 4]);
                         f = functionToExecute(payload.method).bind(this);
-                        console.log("LP: payload.method");
+                        console.log("LP: " + payload.method);
                         return [4 /*yield*/, f(payload)];
                     case 2:
                         result = _a.sent();
