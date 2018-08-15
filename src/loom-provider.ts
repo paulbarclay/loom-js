@@ -297,7 +297,7 @@ export class LoomProvider {
 
     try {
       const f = functionToExecute(payload.method).bind(this)
-      console.log(payload)
+      console.log(`LP: payload.method`)
       const result = await f(payload)
       callback(null, this._okResponse(payload.id, result, isArray))
     } catch (err) {
@@ -515,7 +515,7 @@ export class LoomProvider {
     const caller = new Address(this._client.chainId, LocalAddress.fromHexString(payload.from))
     const address = new Address(this._client.chainId, LocalAddress.fromHexString(payload.to))
     const data = Buffer.from(payload.data.substring(2), 'hex')
-    console.log(`LP CALL: caller:${caller} address:${address} data:${data}`)
+    //console.log(`LP CALL: caller:${caller} address:${address} data:${data}`)
 
     const callTx = new CallTx()
     callTx.setVmType(VMType.EVM)
@@ -537,7 +537,7 @@ export class LoomProvider {
     const caller = new Address(this._client.chainId, LocalAddress.fromHexString(payload.from))
     const address = new Address(this._client.chainId, LocalAddress.fromHexString(payload.to))
     const data = Buffer.from(payload.data.substring(2), 'hex')
-    console.log(`LP static call: caller:${caller} address:${address} data:${payload.data}`)
+    //console.log(`LP static call: caller:${caller} address:${address} data:${payload.data}`)
     return this._client.queryAsync(address, data, VMType.EVM, caller)
   }
 
@@ -674,7 +674,6 @@ export class LoomProvider {
   }
 
   private _onWebSocketMessage(msgEvent: IChainEventArgs) {
-    console.log(JSON.stringify(msgEvent))
     if (msgEvent.data && msgEvent.id !== '0') {
       log(`Socket message arrived ${JSON.stringify(msgEvent)}`)
       this.notificationCallbacks.forEach((callback: Function) => {
